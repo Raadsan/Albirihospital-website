@@ -1,9 +1,20 @@
+import { Hero } from '@/components/Home/Hero';
+import { Appiments } from '@/components/Home/Appiments';
+import { Servcies1 } from '@/components/Home/Servcies1';
+import { About } from '@/components/Home/About';
+import { Services } from '@/components/Home/Services';
+import { SpecialistDoctors } from '@/components/Home/Specialist Doctors';
 import React from 'react';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1>Home Page</h1>
-    </div>
+    <>
+      <Hero />
+      <Appiments />
+      <Servcies1 />
+      <About />
+      <Services />
+      <SpecialistDoctors />
+    </>
   );
 }
