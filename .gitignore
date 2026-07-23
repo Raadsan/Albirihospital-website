@@ -1,0 +1,19 @@
+# Dependencies and build output
+**/node_modules/
+**/.next/
+**/out/
+**/build/
+**/dist/
+
+# Environment variables and secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Logs and local tooling
+*.log
+**/.vercel/
+**/__pycache__/
+**/.venv/
+.DS_Store
+Thumbs.db
