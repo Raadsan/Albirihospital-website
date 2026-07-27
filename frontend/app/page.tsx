@@ -4,6 +4,9 @@ import { Servcies1 } from '@/components/Home/Servcies1';
 import { About } from '@/components/Home/About';
 import { Services } from '@/components/Home/Services';
 import { SpecialistDoctors } from '@/components/Home/Specialist Doctors';
+import { Watch } from '@/components/Home/Watch';
+import { Faq } from '@/components/Home/Faq';
+import { Blog } from '@/components/Home/Blog';
 import React from 'react';
 
 export default function Home() {
@@ -15,6 +18,9 @@ export default function Home() {
       <About />
       <Services />
       <SpecialistDoctors />
+      <Watch />
+      <Faq />
+      <Blog />
     </>
   );
 }

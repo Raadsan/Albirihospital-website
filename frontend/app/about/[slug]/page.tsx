@@ -1,4 +1,11 @@
 import { notFound } from "next/navigation"
+import { AboutBanner } from "@/components/About/AboutBanner"
+import { About } from "@/components/Home/About"
+import { MissionAndVision } from "@/components/About/MissionandVisison"
+import { OurStory } from "@/components/About/ourStory"
+import { CoreValues } from "@/components/About/CoreValues"
+import { WhyChoose } from "@/components/About/Why Choose"
+import { Watch } from "@/components/Home/Watch"
 
 const pages = {
   us: {
@@ -34,10 +41,24 @@ export default async function AboutDetailPage({
   if (!page) notFound()
 
   return (
-    <section className="mx-auto min-h-[calc(100vh-4rem)] max-w-5xl px-6 py-20">
-      <p className="mb-3 font-semibold uppercase tracking-wider text-blue-700">About</p>
-      <h1 className="text-4xl font-bold text-slate-900">{page.title}</h1>
-      <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">{page.description}</p>
-    </section>
+    <>
+      <AboutBanner title={page.title} />
+      {slug === "us" ? (
+        <>
+          <About />
+          <OurStory />
+          <MissionAndVision />
+          <CoreValues />
+          <WhyChoose />
+          <Watch />
+        </>
+      ) : (
+        <section className="mx-auto min-h-96 max-w-5xl px-6 py-20">
+          <p className="font-semibold uppercase tracking-wider text-emerald-600">About Albirri Hospital</p>
+          <h2 className="mt-3 text-3xl font-bold text-slate-900">{page.title}</h2>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">{page.description}</p>
+        </section>
+      )}
+    </>
   )
 }

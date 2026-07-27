@@ -1,9 +1,14 @@
-import React from 'react';
+import { AboutBanner } from "@/components/About/AboutBanner"
+import About from "@/components/Home/About"
+import { Watch } from "@/components/Home/Watch"
 
 export default function AboutPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1>About Page</h1>
-    </div>
-  );
+    <>
+      <AboutBanner />
+      <About />
+      <Watch />
+
+    </>
+  )
 }
