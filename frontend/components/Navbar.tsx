@@ -75,11 +75,12 @@ export function Navbar() {
           <NavigationMenuList className="gap-2">
             {/* Home */}
             <NavigationMenuItem>
-              <Link href="/" legacyBehavior passHref>
-                <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50")}>
-                  Home
-                </NavigationMenuLink>
-              </Link>
+              <NavigationMenuLink
+                render={<Link href="/" />}
+                className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50")}
+              >
+                Home
+              </NavigationMenuLink>
             </NavigationMenuItem>
 
             {/* About */}
@@ -120,20 +121,22 @@ export function Navbar() {
 
             {/* News & Blogs */}
             <NavigationMenuItem>
-              <Link href="/news" legacyBehavior passHref>
-                <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50")}>
-                  News & Blogs
-                </NavigationMenuLink>
-              </Link>
+              <NavigationMenuLink
+                render={<Link href="/news" />}
+                className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50")}
+              >
+                News & Blogs
+              </NavigationMenuLink>
             </NavigationMenuItem>
 
             {/* Contact Us */}
             <NavigationMenuItem>
-              <Link href="/contact" legacyBehavior passHref>
-                <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50")}>
-                  Contact Us
-                </NavigationMenuLink>
-              </Link>
+              <NavigationMenuLink
+                render={<Link href="/contact" />}
+                className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50")}
+              >
+                Contact Us
+              </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
@@ -193,23 +196,22 @@ const ListItem = React.forwardRef<
 >(({ className, title, children, href, ...props }, ref) => {
   return (
     <li>
-      <Link href={href || "#"} legacyBehavior passHref>
-        <NavigationMenuLink
-          ref={ref}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-[#1e3a8a]",
-            className
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          {children && (
-            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-              {children}
-            </p>
-          )}
-        </NavigationMenuLink>
-      </Link>
+      <NavigationMenuLink
+        render={<Link href={href || "#"} />}
+        ref={ref}
+        className={cn(
+          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-[#1e3a8a]",
+          className
+        )}
+        {...props}
+      >
+        <div className="text-sm font-medium leading-none">{title}</div>
+        {children && (
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        )}
+      </NavigationMenuLink>
     </li>
   )
 })

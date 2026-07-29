@@ -1,4 +1,8 @@
 import { notFound } from "next/navigation"
+import {
+  HealthCheckupBanner,
+  HospitalServicesBanner,
+} from "@/components/Services/HealthCheckupBanner"
 
 const pages = {
   "health-checkups": {
@@ -24,6 +28,14 @@ export default async function ServiceDetailPage({
   const page = pages[slug as keyof typeof pages]
 
   if (!page) notFound()
+
+  if (slug === "health-checkups") {
+    return <HealthCheckupBanner />
+  }
+
+  if (slug === "hospital-services") {
+    return <HospitalServicesBanner />
+  }
 
   return (
     <section className="mx-auto min-h-[calc(100vh-4rem)] max-w-5xl px-6 py-20">
