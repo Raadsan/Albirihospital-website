@@ -1,9 +1,11 @@
-import React from 'react';
+import { AboutBanner } from "@/components/About/AboutBanner";
+import Blog from "@/components/Home/Blog";
 
 export default function NewsPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-between p-24">
-      <h1>News & Blogs Page</h1>
-    </div>
+    <>
+      <AboutBanner title="News & Blogs" breadcrumbPage="News" />
+      <Blog />
+    </>
   );
 }

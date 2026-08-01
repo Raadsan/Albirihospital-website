@@ -3,6 +3,8 @@ import {
   HealthCheckupBanner,
   HospitalServicesBanner,
 } from "@/components/Services/HealthCheckupBanner"
+import { Services } from "@/components/Home/Services"
+import { HealthCheckupsList } from "@/components/Services/HealthCheckupsList"
 
 const pages = {
   "health-checkups": {
@@ -30,11 +32,21 @@ export default async function ServiceDetailPage({
   if (!page) notFound()
 
   if (slug === "health-checkups") {
-    return <HealthCheckupBanner />
+    return (
+      <>
+        <HealthCheckupBanner />
+        <HealthCheckupsList />
+      </>
+    )
   }
 
   if (slug === "hospital-services") {
-    return <HospitalServicesBanner />
+    return (
+      <>
+        <HospitalServicesBanner />
+        <Services />
+      </>
+    )
   }
 
   return (

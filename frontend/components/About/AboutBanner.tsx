@@ -7,10 +7,12 @@ import { ChevronRight, Home } from "lucide-react"
 
 type AboutBannerProps = {
     title?: string
+    breadcrumbPage?: string
 }
 
-export function AboutBanner({ title = "About Us" }: AboutBannerProps) {
+export function AboutBanner({ title = "About Us", breadcrumbPage }: AboutBannerProps) {
     const prefersReducedMotion = useReducedMotion()
+    const displayBreadcrumb = breadcrumbPage || (title === "About Us" ? "About" : title)
 
     return (
         <section className="relative isolate flex min-h-64 items-center justify-center overflow-hidden px-4 py-16 sm:min-h-72 sm:px-6 lg:min-h-80 lg:px-8">
@@ -65,7 +67,7 @@ export function AboutBanner({ title = "About Us" }: AboutBannerProps) {
                     </Link>
                     <ChevronRight aria-hidden="true" className="size-3.5 text-blue-200/70" />
                     <span aria-current="page" className="text-white">
-                        About
+                        {displayBreadcrumb}
                     </span>
                 </motion.nav>
             </motion.div>
