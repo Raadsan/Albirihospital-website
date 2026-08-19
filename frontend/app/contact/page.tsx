@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from "framer-motion";
-import { Phone, MapPin, Clock3, Mail, Send, CheckCircle2 } from "lucide-react";
+import { Phone, MapPin, Clock3, Mail, Send, CheckCircle2, ArrowUpRight } from "lucide-react";
 import { AboutBanner } from "@/components/About/AboutBanner";
 
 export default function ContactPage() {
@@ -51,7 +51,7 @@ export default function ContactPage() {
       title: "Visit Us",
       value: "KM14 Afgoi Road",
       desc: "Mogadishu, Somalia. Located in a prime area.",
-      href: "#",
+      href: "#hospital-location",
       color: "text-[#1e40af]",
       bg: "bg-blue-50"
     },
@@ -91,10 +91,10 @@ export default function ContactPage() {
                 GET IN TOUCH
               </span>
               <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                We're Here to Help You and Your Family
+                We&apos;re Here to Help You and Your Family
               </h2>
               <p className="mt-5 text-base leading-7 text-slate-600">
-                Have questions or need assistance? Please don't hesitate to reach out. Our professional team is always ready to support you.
+                Have questions or need assistance? Please don&apos;t hesitate to reach out. Our professional team is always ready to support you.
               </p>
 
               <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
@@ -230,6 +230,64 @@ export default function ContactPage() {
             </motion.div>
 
           </div>
+
+          <motion.div
+            id="hospital-location"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.65 }}
+            className="mt-16 scroll-mt-28 overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.09)] sm:mt-20 lg:grid lg:grid-cols-[0.72fr_1.28fr]"
+          >
+            <div className="relative overflow-hidden bg-[#0d245f] p-7 text-white sm:p-10 lg:flex lg:flex-col lg:justify-between lg:p-12">
+              <div
+                aria-hidden="true"
+                className="absolute -right-20 -top-20 size-56 rounded-full bg-blue-400/20 blur-3xl"
+              />
+              <div
+                aria-hidden="true"
+                className="absolute -bottom-20 -left-20 size-56 rounded-full bg-emerald-400/15 blur-3xl"
+              />
+
+              <div className="relative">
+                <div className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500 shadow-lg shadow-emerald-950/20">
+                  <MapPin aria-hidden="true" className="size-6" />
+                </div>
+                <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-emerald-300">
+                  Find our hospital
+                </p>
+                <h2 className="mt-3 text-2xl font-bold sm:text-3xl">Visit Albirri Hospital</h2>
+                <p className="mt-4 max-w-md text-sm leading-7 text-blue-100/80 sm:text-base">
+                  We are conveniently located on KM14 Afgoi Road in Mogadishu. Use the map to find the easiest route to our hospital.
+                </p>
+              </div>
+
+              <div className="relative mt-8 border-t border-white/15 pt-6">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-200/70">Hospital address</p>
+                <p className="mt-2 font-semibold text-white">KM14 Afgoi Road, Mogadishu, Somalia</p>
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=Albirri+Hospital+KM14+Afgoi+Road+Mogadishu+Somalia"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-6 inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-3 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/40"
+                >
+                  Open in Google Maps
+                  <ArrowUpRight aria-hidden="true" className="size-4" />
+                </a>
+              </div>
+            </div>
+
+            <div className="relative min-h-[26rem] bg-slate-100 sm:min-h-[32rem]">
+              <iframe
+                title="Albirri Hospital location on Google Maps"
+                src="https://www.google.com/maps?q=Albirri+Hospital,+KM14+Afgoi+Road,+Mogadishu,+Somalia&output=embed"
+                className="absolute inset-0 h-full w-full border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+              />
+            </div>
+          </motion.div>
         </div>
       </section>
     </>

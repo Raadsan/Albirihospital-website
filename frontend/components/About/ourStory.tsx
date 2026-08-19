@@ -37,6 +37,13 @@ const highlights = [
     { icon: HeartHandshake, value: "We care", label: "Our commitment" },
 ] as const
 
+const storyChapterLayouts = {
+    "1991": "md:col-span-1 lg:col-span-5 lg:col-start-8 lg:row-start-1",
+    "2013": "md:col-span-1 lg:col-span-5 lg:col-start-8 lg:row-start-2",
+    Today: "md:col-span-1 lg:col-span-4 lg:col-start-1 lg:row-start-3",
+    Future: "md:col-span-1 lg:col-span-8 lg:col-start-5 lg:row-start-3",
+} as const
+
 export function OurStory() {
     const prefersReducedMotion = useReducedMotion()
 
@@ -65,85 +72,84 @@ export function OurStory() {
                     </p>
                 </motion.div>
 
-                <div className="grid items-start gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+                <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-12 lg:grid-rows-[auto_auto_auto]">
                     <motion.div
                         initial={prefersReducedMotion ? false : { opacity: 0, x: -45 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, amount: 0.2 }}
                         transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-                        className="lg:sticky lg:top-28"
+                        className="group relative min-h-[32rem] overflow-hidden rounded-[2rem] bg-slate-100 shadow-[0_22px_60px_rgba(15,23,42,0.16)] md:col-span-2 md:min-h-[38rem] lg:col-span-7 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:min-h-[44rem]"
                     >
-                        <div className="relative h-[26rem] overflow-hidden rounded-[2rem] bg-slate-100 shadow-[0_22px_60px_rgba(15,23,42,0.16)] sm:h-[32rem]">
-                            <Image
-                                src="/images/2.png"
-                                alt="Albirri Hospital and its healthcare facilities"
-                                fill
-                                sizes="(min-width: 1024px) 40vw, 100vw"
-                                className="object-cover transition-transform duration-[1500ms] hover:scale-105"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0d245f]/80 via-transparent to-transparent" />
-                            <div className="absolute bottom-6 left-6 right-6">
-                                <div className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg">
-                                    <Building2 aria-hidden="true" className="size-6" />
-                                </div>
-                                <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">
-                                    Serving since 2013
-                                </p>
-                                <p className="mt-2 text-2xl font-bold text-white">Built for the community</p>
-                            </div>
-                        </div>
+                        <Image
+                            src="/images/2.png"
+                            alt="Albirri Hospital and its healthcare facilities"
+                            fill
+                            sizes="(min-width: 1024px) 58vw, 100vw"
+                            className="object-cover transition-transform duration-[1500ms] group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#081b4d]/95 via-[#0d245f]/20 to-transparent" />
 
-                        <div className="relative -mt-5 mx-4 grid grid-cols-3 gap-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl sm:mx-6 sm:gap-4">
-                            {highlights.map((item) => {
-                                const Icon = item.icon
-                                return (
-                                    <div key={item.label} className="text-center">
-                                        <Icon aria-hidden="true" className="mx-auto size-5 text-emerald-500" />
-                                        <p className="mt-2 text-sm font-bold text-[#1E40AF] sm:text-base">{item.value}</p>
-                                        <p className="mt-0.5 text-[10px] leading-4 text-slate-500 sm:text-xs">{item.label}</p>
-                                    </div>
-                                )
-                            })}
+                        <div className="absolute inset-x-5 bottom-5 sm:inset-x-8 sm:bottom-8">
+                            <div className="flex size-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg">
+                                <Building2 aria-hidden="true" className="size-6" />
+                            </div>
+                            <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">
+                                Serving since 2013
+                            </p>
+                            <p className="mt-2 text-2xl font-bold text-white sm:text-3xl">Built for the community</p>
+
+                            <div className="mt-5 grid grid-cols-3 divide-x divide-white/15 rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-md sm:p-4">
+                                {highlights.map((item) => {
+                                    const Icon = item.icon
+                                    return (
+                                        <div key={item.label} className="px-2 text-center sm:px-4">
+                                            <Icon aria-hidden="true" className="mx-auto size-5 text-emerald-300" />
+                                            <p className="mt-2 text-sm font-bold text-white sm:text-base">{item.value}</p>
+                                            <p className="mt-0.5 text-[10px] leading-4 text-blue-100 sm:text-xs">
+                                                {item.label}
+                                            </p>
+                                        </div>
+                                    )
+                                })}
+                            </div>
                         </div>
                     </motion.div>
 
-                    <div className="relative">
-                        <div
-                            aria-hidden="true"
-                            className="absolute bottom-4 left-[1.1rem] top-4 w-px bg-gradient-to-b from-[#1E40AF] via-blue-200 to-emerald-400 sm:left-6"
-                        />
-
-                        <div className="space-y-9">
-                            {storyChapters.map((chapter, index) => (
-                                <motion.article
-                                    key={chapter.year}
-                                    initial={prefersReducedMotion ? false : { opacity: 0, x: 35 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true, amount: 0.15 }}
-                                    transition={{
-                                        delay: prefersReducedMotion ? 0 : index * 0.06,
-                                        duration: 0.65,
-                                        ease: [0.22, 1, 0.36, 1],
-                                    }}
-                                    className="relative pl-12 sm:pl-16"
-                                >
-                                    <span className="absolute left-0 top-1 flex size-9 items-center justify-center rounded-full border-4 border-white bg-[#1E40AF] shadow-md shadow-blue-900/20 sm:size-12">
-                                        <span className="size-2.5 rounded-full bg-emerald-300 sm:size-3" />
-                                    </span>
-
-                                    <div className="rounded-3xl border border-slate-200/80 bg-slate-50/70 p-6 transition-all duration-300 hover:border-blue-200 hover:bg-white hover:shadow-[0_15px_40px_rgba(15,23,42,0.07)] sm:p-8">
+                    {storyChapters.map((chapter, index) => (
+                        <motion.article
+                            key={chapter.year}
+                            initial={prefersReducedMotion ? false : { opacity: 0, y: 25 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true, amount: 0.15 }}
+                            transition={{
+                                delay: prefersReducedMotion ? 0 : index * 0.06,
+                                duration: 0.65,
+                                ease: [0.22, 1, 0.36, 1],
+                            }}
+                            className={`h-full ${storyChapterLayouts[chapter.year]}`}
+                        >
+                            <div className="group relative h-full overflow-hidden rounded-[2rem] border border-slate-200/80 bg-slate-50/70 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:bg-white hover:shadow-[0_15px_40px_rgba(15,23,42,0.07)] sm:p-7 lg:p-8">
+                                <div
+                                    aria-hidden="true"
+                                    className="absolute -right-12 -top-12 size-32 rounded-full bg-blue-100/70 transition-transform duration-500 group-hover:scale-125"
+                                />
+                                <div className="relative">
+                                    <div className="flex items-center gap-3">
+                                        <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#1E40AF] shadow-md shadow-blue-900/20">
+                                            <span className="size-2.5 rounded-full bg-emerald-300" />
+                                        </span>
                                         <span className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-[#1E40AF]">
                                             {chapter.year}
                                         </span>
-                                        <h3 className="mt-4 text-xl font-bold text-slate-900 sm:text-2xl">{chapter.title}</h3>
-                                        <p className="mt-4 text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
-                                            {chapter.text}
-                                        </p>
                                     </div>
-                                </motion.article>
-                            ))}
-                        </div>
-                    </div>
+                                    <h3 className="mt-5 text-xl font-bold text-slate-900 sm:text-2xl">{chapter.title}</h3>
+                                    <p className="mt-4 text-sm leading-7 text-slate-600 sm:text-base sm:leading-8">
+                                        {chapter.text}
+                                    </p>
+                                </div>
+                            </div>
+                        </motion.article>
+                    ))}
                 </div>
             </div>
         </section>
