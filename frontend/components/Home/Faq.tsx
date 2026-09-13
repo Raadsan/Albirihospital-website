@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { Plus } from "lucide-react"
 import { useState } from "react"
+import { useLanguage } from "@/components/language-provider"
 
 const faqs = [
     {
@@ -35,6 +36,7 @@ const faqs = [
 export function Faq() {
     const [openItem, setOpenItem] = useState<number | null>(null)
     const prefersReducedMotion = useReducedMotion()
+    const { t } = useLanguage()
 
     return (
         <section className="relative overflow-hidden bg-slate-50 px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
@@ -56,15 +58,14 @@ export function Faq() {
                     className="lg:sticky lg:top-28 lg:self-start"
                 >
                     <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-600">
-                        FAQ&apos;s
+                        {t("FAQ's")}
                     </p>
                     <h2 className="mt-3 max-w-lg text-3xl font-bold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-                        Frequently Asked
-                        <span className="block text-[#1E40AF]">Questions</span>
+                        {t("Frequently Asked")}
+                        <span className="block text-[#1E40AF]">{t("Questions")}</span>
                     </h2>
                     <p className="mt-6 max-w-lg text-base leading-7 text-slate-600 sm:text-lg">
-                        Find quick answers to common questions about Albirri Hospital, our medical services, and how we
-                        care for you.
+                        {t("Find quick answers to common questions about Albirri Hospital, our medical services, and how we care for you.")}
                     </p>
                 </motion.div>
 
@@ -101,7 +102,7 @@ export function Faq() {
                                         className="group flex w-full items-center justify-between gap-5 px-5 py-5 text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-blue-100 sm:px-7 sm:py-6"
                                     >
                                         <span className="text-base font-semibold leading-6 text-slate-900 transition-colors group-hover:text-[#1E40AF] sm:text-lg">
-                                            {faq.question}
+                                            {t(faq.question)}
                                         </span>
                                         <span
                                             className={`flex size-9 shrink-0 items-center justify-center rounded-full border transition-colors duration-300 ${
@@ -134,7 +135,7 @@ export function Faq() {
                                             className="overflow-hidden"
                                         >
                                             <p className="mx-5 border-t border-slate-100 pb-6 pt-4 text-sm leading-7 text-slate-600 sm:mx-7 sm:pr-14 sm:text-base">
-                                                {faq.answer}
+                                                {t(faq.answer)}
                                             </p>
                                         </motion.div>
                                     )}

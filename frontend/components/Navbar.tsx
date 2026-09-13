@@ -22,6 +22,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { useLanguage } from "@/components/language-provider"
 
 const aboutItems: { title: string; href: string }[] = [
   { title: "About Us", href: "/about/us" },
@@ -47,6 +48,8 @@ const departmentsItems: { title: string; href: string }[] = [
 ]
 
 export function Navbar() {
+  const { direction, t } = useLanguage()
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -79,17 +82,17 @@ export function Navbar() {
                 render={<Link href="/" />}
                 className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50")}
               >
-                Home
+                {t("Home")}
               </NavigationMenuLink>
             </NavigationMenuItem>
 
             {/* About */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50">About</NavigationMenuTrigger>
+              <NavigationMenuTrigger className="bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50">{t("About")}</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[200px] gap-3 p-4">
                   {aboutItems.map((item) => (
-                    <ListItem key={item.title} title={item.title} href={item.href} />
+                    <ListItem key={item.title} title={t(item.title)} href={item.href} />
                   ))}
                 </ul>
               </NavigationMenuContent>
@@ -97,11 +100,11 @@ export function Navbar() {
 
             {/* Services */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50">Services</NavigationMenuTrigger>
+              <NavigationMenuTrigger className="bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50">{t("Services")}</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[200px] gap-3 p-4">
                   {servicesItems.map((item) => (
-                    <ListItem key={item.title} title={item.title} href={item.href} />
+                    <ListItem key={item.title} title={t(item.title)} href={item.href} />
                   ))}
                 </ul>
               </NavigationMenuContent>
@@ -109,11 +112,11 @@ export function Navbar() {
 
             {/* Departments */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50">Departments</NavigationMenuTrigger>
+              <NavigationMenuTrigger className="bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50">{t("Departments")}</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid w-[200px] gap-3 p-4">
                   {departmentsItems.map((item) => (
-                    <ListItem key={item.title} title={item.title} href={item.href} />
+                    <ListItem key={item.title} title={t(item.title)} href={item.href} />
                   ))}
                 </ul>
               </NavigationMenuContent>
@@ -125,7 +128,7 @@ export function Navbar() {
                 render={<Link href="/news" />}
                 className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50")}
               >
-                News & Blogs
+                {t("News & Blogs")}
               </NavigationMenuLink>
             </NavigationMenuItem>
 
@@ -135,7 +138,7 @@ export function Navbar() {
                 render={<Link href="/contact" />}
                 className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-800 font-medium hover:bg-blue-50 hover:text-[#1e40af] focus:bg-blue-50 focus:text-[#1e40af] data-[active]:bg-blue-50 data-[state=open]:bg-blue-50")}
               >
-                Contact Us
+                {t("Contact Us")}
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
@@ -147,7 +150,7 @@ export function Navbar() {
           <div className="hidden sm:block">
             <Link href="/appointment">
               <Button className="rounded-full bg-[#10b981] text-white hover:bg-[#1E40AF] font-semibold text-base px-8 py-6 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
-                Appointment
+                {t("Appointment")}
               </Button>
             </Link>
           </div>
@@ -161,23 +164,23 @@ export function Navbar() {
                     variant="ghost"
                     size="icon"
                     className="text-zinc-800"
-                    aria-label="Open navigation menu"
+                    aria-label={t("Open navigation menu")}
                   />
                 }
               >
                 <Menu className="w-8 h-8" />
               </SheetTrigger>
-              <SheetContent side="right" className="bg-white border-none w-[300px] p-6 z-[100]">
+              <SheetContent side={direction === "rtl" ? "left" : "right"} className="bg-white border-none w-[300px] p-6 z-[100]">
                 <div className="flex flex-col gap-6 mt-8">
-                  <Link href="/" className="text-lg font-semibold text-zinc-800 hover:text-[#1e40af]">Home</Link>
-                  <Link href="/about/us" className="text-lg font-semibold text-zinc-800 hover:text-[#1e40af]">About</Link>
-                  <Link href="/services/hospital-services" className="text-lg font-semibold text-zinc-800 hover:text-[#1e40af]">Services</Link>
-                  <Link href="/departments/outpatient" className="text-lg font-semibold text-zinc-800 hover:text-[#1e40af]">Departments</Link>
-                  <Link href="/news" className="text-lg font-semibold text-zinc-800 hover:text-[#1e40af]">News & Blogs</Link>
-                  <Link href="/contact" className="text-lg font-semibold text-zinc-800 hover:text-[#1e40af]">Contact Us</Link>
+                  <Link href="/" className="text-lg font-semibold text-zinc-800 hover:text-[#1e40af]">{t("Home")}</Link>
+                  <Link href="/about/us" className="text-lg font-semibold text-zinc-800 hover:text-[#1e40af]">{t("About")}</Link>
+                  <Link href="/services/hospital-services" className="text-lg font-semibold text-zinc-800 hover:text-[#1e40af]">{t("Services")}</Link>
+                  <Link href="/departments/outpatient" className="text-lg font-semibold text-zinc-800 hover:text-[#1e40af]">{t("Departments")}</Link>
+                  <Link href="/news" className="text-lg font-semibold text-zinc-800 hover:text-[#1e40af]">{t("News & Blogs")}</Link>
+                  <Link href="/contact" className="text-lg font-semibold text-zinc-800 hover:text-[#1e40af]">{t("Contact Us")}</Link>
                   <Link href="/appointment" className="mt-6">
                     <Button className="w-full rounded-full bg-[#10b981] text-white hover:bg-[#1E40AF] font-semibold py-6 text-base">
-                      Book Appointment
+                      {t("Book Appointment")}
                     </Button>
                   </Link>
                 </div>

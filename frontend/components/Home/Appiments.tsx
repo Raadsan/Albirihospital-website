@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowRight, CalendarDays, Clock3, Phone, UserRound } from "lucide-react"
+import { useLanguage } from "@/components/language-provider"
 
 const fields = [
     { id: "name", label: "Name", placeholder: "Your name", type: "text", icon: UserRound, autoComplete: "name" },
@@ -12,9 +13,10 @@ const fields = [
 
 export function Appiments() {
     const prefersReducedMotion = useReducedMotion()
+    const { t } = useLanguage()
 
     return (
-        <section aria-label="Quick appointment booking" className="relative z-20 mx-auto -mt-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section aria-label={t("Quick appointment booking")} className="relative z-20 mx-auto -mt-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
             <motion.form
                 action="/appointment"
                 method="get"
@@ -36,14 +38,14 @@ export function Appiments() {
                             transition={{ delay: 0.12 + index * 0.08, duration: 0.45 }}
                             className="group flex min-w-0 flex-col gap-2 rounded-xl border border-transparent px-3 py-2 transition-colors focus-within:border-blue-100 focus-within:bg-blue-50/50 hover:bg-slate-50"
                         >
-                            <span className="text-xs font-semibold text-slate-800">{field.label}</span>
+                            <span className="text-xs font-semibold text-slate-800">{t(field.label)}</span>
                             <span className="flex items-center gap-2">
                                 <Icon aria-hidden="true" className="size-4 shrink-0 text-blue-700 transition-transform group-focus-within:scale-110" />
                                 <input
                                     id={field.id}
                                     name={field.id}
                                     type={field.type}
-                                    placeholder={field.placeholder}
+                                    placeholder={field.placeholder ? t(field.placeholder) : ""}
                                     autoComplete={field.autoComplete}
                                     required
                                     className="min-w-0 flex-1 bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
@@ -63,7 +65,7 @@ export function Appiments() {
                     transition={{ delay: 0.45, duration: 0.4 }}
                     className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-blue-700 px-6 text-sm font-semibold whitespace-nowrap text-white shadow-lg shadow-blue-700/20 transition-colors hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 md:col-span-2 lg:col-span-1 lg:mt-0"
                 >
-                    Book an appointment
+                    {t("Book an appointment")}
                     <ArrowRight aria-hidden="true" className="size-4" />
                 </motion.button>
             </motion.form>

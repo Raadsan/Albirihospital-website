@@ -6,6 +6,7 @@ import { motion, useReducedMotion } from "framer-motion"
 import { ArrowUpRight, BadgeCheck, CalendarDays } from "lucide-react"
 
 import { Card } from "@/components/ui/card"
+import { useLanguage } from "@/components/language-provider"
 
 const doctors = [
     {
@@ -42,6 +43,7 @@ const doctors = [
 
 export function SpecialistDoctors() {
     const prefersReducedMotion = useReducedMotion()
+    const { t } = useLanguage()
 
     return (
         <section className="relative overflow-hidden bg-white px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
@@ -56,13 +58,13 @@ export function SpecialistDoctors() {
                     className="mx-auto mb-12 max-w-2xl text-center"
                 >
                     <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-600">
-                        Meet our medical team
+                        {t("Meet our medical team")}
                     </p>
                     <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-                        Specialist <span className="text-[#1E40AF]">Doctors</span>
+                        {t("Specialist")} <span className="text-[#1E40AF]">{t("Doctors")}</span>
                     </h2>
                     <p className="mt-4 leading-7 text-slate-600">
-                        Experienced specialists committed to providing trusted, compassionate care.
+                        {t("Experienced specialists committed to providing trusted, compassionate care.")}
                     </p>
                 </motion.div>
 
@@ -94,11 +96,11 @@ export function SpecialistDoctors() {
 
                                     <div className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
                                         <BadgeCheck aria-hidden="true" className="size-4 text-emerald-400" />
-                                        Specialist
+                                        {t("Specialist")}
                                     </div>
 
                                     <div className="absolute inset-x-0 bottom-0 p-6">
-                                        <p className="text-sm font-semibold text-emerald-400">{doctor.specialty}</p>
+                                        <p className="text-sm font-semibold text-emerald-400">{t(doctor.specialty)}</p>
                                         <h3 className="mt-1 text-2xl font-bold text-white">{doctor.name}</h3>
 
                                         <div className="mt-5 flex items-center justify-between border-t border-white/20 pt-4">
@@ -107,7 +109,7 @@ export function SpecialistDoctors() {
                                                 className="inline-flex items-center gap-2 text-sm font-semibold text-white transition-colors hover:text-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                                             >
                                                 <CalendarDays aria-hidden="true" className="size-4" />
-                                                Book appointment
+                                                {t("Book appointment")}
                                             </Link>
                                             <span className="flex size-10 items-center justify-center rounded-full bg-white text-[#1E40AF] transition-all duration-300 group-hover:rotate-45 group-hover:bg-emerald-400 group-hover:text-white">
                                                 <ArrowUpRight aria-hidden="true" className="size-4" />
@@ -131,7 +133,7 @@ export function SpecialistDoctors() {
                         href="/about/doctors"
                         className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-6 py-3 font-semibold text-[#1E40AF] transition-all duration-300 hover:-translate-y-1 hover:border-[#1E40AF] hover:bg-[#1E40AF] hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
                     >
-                        View all doctors
+                        {t("View all doctors")}
                         <ArrowUpRight aria-hidden="true" className="size-4" />
                     </Link>
                 </motion.div>

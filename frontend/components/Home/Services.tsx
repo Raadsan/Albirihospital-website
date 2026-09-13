@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 
 import { Card, CardContent } from "@/components/ui/card"
+import { useLanguage } from "@/components/language-provider"
 
 const services = [
     {
@@ -86,6 +87,7 @@ const services = [
 
 export function Services() {
     const prefersReducedMotion = useReducedMotion()
+    const { t } = useLanguage()
 
     return (
         <section className="relative overflow-hidden bg-slate-50 px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
@@ -100,12 +102,12 @@ export function Services() {
                     transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
                     className="mx-auto mb-12 max-w-2xl text-center"
                 >
-                    <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-600">Our medical care</p>
+                    <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-600">{t("Our medical care")}</p>
                     <h2 className="mt-3 text-3xl font-bold tracking-tight text-[#1E40AF] sm:text-4xl lg:text-5xl">
-                        Hospital Services
+                        {t("Hospital Services")}
                     </h2>
                     <p className="mt-4 leading-7 text-slate-600">
-                        At Albirri Hospital, patient care is our top priority.
+                        {t("At Albirri Hospital, patient care is our top priority.")}
                     </p>
                 </motion.div>
 
@@ -148,15 +150,15 @@ export function Services() {
                                         </motion.div>
 
                                         <h3 className="text-xl font-bold text-slate-900 transition-colors duration-300 group-hover:text-[#1E40AF]">
-                                            {service.title}
+                                            {t(service.title)}
                                         </h3>
-                                        <p className="mt-3 text-sm leading-6 text-slate-600">{service.description}</p>
+                                        <p className="mt-3 text-sm leading-6 text-slate-600">{t(service.description)}</p>
 
                                         <Link
                                             href={service.href}
                                             className="mt-auto inline-flex w-fit items-center gap-2 pt-5 text-sm font-bold text-[#1E40AF] transition-colors hover:text-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                                         >
-                                            Learn more
+                                            {t("Learn more")}
                                             <ArrowRight
                                                 aria-hidden="true"
                                                 className="size-4 transition-transform duration-300 group-hover:translate-x-1"

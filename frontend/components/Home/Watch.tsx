@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { ArrowLeft, ArrowRight, Play, Video as VideoIcon } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
+import { useLanguage } from "@/components/language-provider"
 
 type Video = {
     title: string
@@ -53,6 +54,7 @@ function getYouTubeId(url: string) {
 
 function VideoCard({ video }: { video: Video }) {
     const videoId = getYouTubeId(video.youtubeUrl)
+    const { t } = useLanguage()
 
     return (
         <article className="group overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_18px_55px_-30px_rgba(15,23,42,0.35)]">
@@ -70,12 +72,12 @@ function VideoCard({ video }: { video: Video }) {
             <div className="p-5">
                 <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-emerald-600">
                     <Play className="size-3.5 fill-current" aria-hidden="true" />
-                    Watch & Learn
+                    {t("Watch & Learn")}
                 </div>
                 <h3 className="line-clamp-2 text-lg font-bold leading-snug text-slate-900">
-                    {video.title}
+                    {t(video.title)}
                 </h3>
-                <p className="mt-2 text-sm text-slate-500">{video.doctor}</p>
+                <p className="mt-2 text-sm text-slate-500">{t(video.doctor)}</p>
             </div>
         </article>
     )
@@ -86,6 +88,7 @@ export function Watch() {
     const [direction, setDirection] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(3)
     const prefersReducedMotion = useReducedMotion()
+    const { t } = useLanguage()
 
     useEffect(() => {
         const updateItemsPerPage = () => {
@@ -130,14 +133,14 @@ export function Watch() {
                 >
                     <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-2 text-sm font-bold text-red-600">
                         <VideoIcon className="size-5" aria-hidden="true" />
-                        Health Videos
+                        {t("Health Videos")}
                     </div>
                     <h2 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
-                        Trusted Medical Insights from{" "}
-                        <span className="text-emerald-600">Al-Birri Hospital Experts</span>
+                        {t("Trusted Medical Insights from")}{" "}
+                        <span className="text-emerald-600">{t("Al-Birri Hospital Experts")}</span>
                     </h2>
                     <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-                        Your Health Matters: Watch &amp; Learn
+                        {t("Your Health Matters: Watch & Learn")}
                     </p>
                 </motion.div>
 
@@ -171,13 +174,13 @@ export function Watch() {
                     <button
                         type="button"
                         onClick={() => changePage(-1)}
-                        aria-label="Previous videos"
+                        aria-label={t("Previous videos")}
                         className="grid size-11 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-emerald-500 hover:bg-emerald-500 hover:text-white"
                     >
                         <ArrowLeft className="size-5" aria-hidden="true" />
                     </button>
 
-                    <div className="flex gap-2" aria-label="Video pages">
+                    <div className="flex gap-2" aria-label={t("Video pages")}>
                         {Array.from({ length: pageCount }, (_, index) => (
                             <button
                                 key={index}
@@ -186,7 +189,7 @@ export function Watch() {
                                     setDirection(index > activePage ? 1 : -1)
                                     setPage(index)
                                 }}
-                                aria-label={`Go to video page ${index + 1}`}
+                                aria-label={t(`Go to video page ${index + 1}`)}
                                 aria-current={index === activePage}
                                 className={`h-2.5 rounded-full transition-all duration-300 ${
                                     index === activePage
@@ -200,7 +203,7 @@ export function Watch() {
                     <button
                         type="button"
                         onClick={() => changePage(1)}
-                        aria-label="Next videos"
+                        aria-label={t("Next videos")}
                         className="grid size-11 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-emerald-500 hover:bg-emerald-500 hover:text-white"
                     >
                         <ArrowRight className="size-5" aria-hidden="true" />

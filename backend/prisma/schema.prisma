@@ -5,3 +5,106 @@ generator client {
 datasource db {
   provider = "mysql"
 }
+
+enum Role {
+  ADMIN
+  RECEPTIONIST
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model Appointment {
+  id         String            @id @default(uuid())
+  name       String
+  phone      String
+  email      String?
+  department String            @default("general")
+  date       String
+  time       String
+  message    String?           @db.Text
+  status     AppointmentStatus @default(PENDING)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+
+  @@map("appointments")
+}
+
+model Doctor {
+  id          String   @id @default(uuid())
+  name        String
+  title       String
+  specialty   String
+  badge       String   @default("Specialist")
+  image       String   @db.Text
+  details     String?  @db.Text
+  department  String?
+  experience  String?
+  available   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("doctors")
+}
+
+model Video {
+  id          String   @id @default(uuid())
+  title       String
+  doctor      String   @default("Al-Birri Medical Team")
+  youtubeUrl  String   @db.Text
+  category    String   @default("Watch & Learn")
+  description String?  @db.Text
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("videos")
+}
+
+model Blog {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  excerpt     String   @db.Text
+  content     String   @db.Text
+  image       String   @db.Text
+  category    String
+  author      String   @default("Al-Birri Medical Team")
+  published   Boolean  @default(true)
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("blogs")
+}
+model Leadershipes {
+  id          String   @id @default(uuid())
+  name        String
+  title       String
+  specialty   String
+  badge       String   @default("Specialist")
+  image       String   @db.Text
+  details     String?  @db.Text
+  experience  String?
+  available   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("leadershipes")
+}

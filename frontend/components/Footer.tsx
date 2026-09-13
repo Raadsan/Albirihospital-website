@@ -4,6 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { motion, useReducedMotion } from "framer-motion"
 import { Clock3, MapPin, Phone } from "lucide-react"
+import { useLanguage } from "@/components/language-provider"
 
 const quickLinks = [
     { label: "About us", href: "/about/us" },
@@ -28,6 +29,7 @@ const socialLinks = [
 
 export function Footer() {
     const prefersReducedMotion = useReducedMotion()
+    const { t } = useLanguage()
 
     return (
         <footer className="relative overflow-hidden bg-[#0d245f] px-4 pt-12 text-white sm:px-6 lg:px-8">
@@ -51,7 +53,7 @@ export function Footer() {
                     <div>
                         <Link
                             href="/"
-                            aria-label="Albirri Hospital home"
+                            aria-label={t("Albirri Hospital home")}
                             className="inline-flex rounded-2xl px-2 py-1 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/40"
                         >
                             <Image
@@ -63,7 +65,7 @@ export function Footer() {
                             />
                         </Link>
                         <p className="mt-5 max-w-sm text-sm leading-6 text-blue-100/75">
-                            Trusted, modern healthcare delivered with respect,<br /> compassion, and dignity.
+                            {t("Trusted, modern healthcare delivered with respect,")}<br /> {t("compassion, and dignity.")}
 
                         </p>
                         <div className="mt-5 flex items-center gap-2.5">
@@ -73,7 +75,7 @@ export function Footer() {
                                     href={social.href}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    aria-label={`Follow Albirri Hospital on ${social.label}`}
+                                    aria-label={t(`Follow Albirri Hospital on ${social.label}`)}
                                     whileHover={prefersReducedMotion ? undefined : { y: -4, scale: 1.06 }}
                                     whileTap={prefersReducedMotion ? undefined : { scale: 0.94 }}
                                     className="flex size-10 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white transition-colors duration-300 hover:border-emerald-400 hover:bg-emerald-500 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300/40"
@@ -110,8 +112,8 @@ export function Footer() {
                         </div>
                     </div>
 
-                    <nav aria-label="Footer quick links">
-                        <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-emerald-400">Quick links</h2>
+                    <nav aria-label={t("Footer quick links")}>
+                        <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-emerald-400">{t("Quick links")}</h2>
                         <ul className="mt-5 space-y-3">
                             {quickLinks.map((link) => (
                                 <li key={link.href}>
@@ -119,15 +121,15 @@ export function Footer() {
                                         href={link.href}
                                         className="text-sm text-blue-100/75 transition-colors hover:text-white focus-visible:outline-none focus-visible:text-emerald-300"
                                     >
-                                        {link.label}
+                                        {t(link.label)}
                                     </Link>
                                 </li>
                             ))}
                         </ul>
                     </nav>
 
-                    <nav aria-label="Footer services">
-                        <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-emerald-400">Services</h2>
+                    <nav aria-label={t("Footer services")}>
+                        <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-emerald-400">{t("Services")}</h2>
                         <ul className="mt-5 space-y-3">
                             {serviceLinks.map((link) => (
                                 <li key={link.href}>
@@ -135,7 +137,7 @@ export function Footer() {
                                         href={link.href}
                                         className="text-sm text-blue-100/75 transition-colors hover:text-white focus-visible:outline-none focus-visible:text-emerald-300"
                                     >
-                                        {link.label}
+                                        {t(link.label)}
                                     </Link>
                                 </li>
                             ))}
@@ -143,7 +145,7 @@ export function Footer() {
                     </nav>
 
                     <div>
-                        <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-emerald-400">Contact</h2>
+                        <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-emerald-400">{t("Contact")}</h2>
                         <ul className="mt-5 space-y-4 text-sm text-blue-100/75">
                             <li>
                                 <a
@@ -154,26 +156,26 @@ export function Footer() {
                                         <Phone aria-hidden="true" className="size-4" />
                                     </span>
                                     <span>
-                                        <span className="block text-xs text-blue-200/60">Emergency line</span>
+                                        <span className="block text-xs text-blue-200/60">{t("Emergency line")}</span>
                                         <span className="font-semibold text-white">4446</span>
                                     </span>
                                 </a>
                             </li>
                             <li className="flex items-start gap-3">
                                 <MapPin aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-emerald-400" />
-                                <span>KM14 Afgoi Road, Mogadishu, Somalia</span>
+                                <span>{t("KM14 Afgoi Road, Mogadishu, Somalia")}</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Clock3 aria-hidden="true" className="size-5 shrink-0 text-emerald-400" />
-                                <span>Emergency care open 24/7</span>
+                                <span>{t("Emergency care open 24/7")}</span>
                             </li>
                         </ul>
                     </div>
                 </div>
 
                 <div className="flex flex-col gap-3 border-t border-white/10 py-5 text-xs text-blue-100/60 sm:flex-row sm:items-center sm:justify-between">
-                    <p>© {new Date().getFullYear()} Albirri Hospital. All rights reserved.</p>
-                    <p>Powered by Deero Advert</p>
+                    <p>© {new Date().getFullYear()} {t("Albirri Hospital. All rights reserved.")}</p>
+                    <p>{t("Powered by Deero Advert")}</p>
                 </div>
             </motion.div>
         </footer>

@@ -5,12 +5,14 @@ import Link from "next/link"
 import { ArrowRight, CalendarDays } from "lucide-react"
 import { motion, useReducedMotion } from "framer-motion"
 import { useEffect, useState } from "react"
+import { useLanguage } from "@/components/language-provider"
 
 const heroImages = ["/images/1.png", "/images/2.png", "/images/3.png"]
 
 export function Hero() {
     const [activeImage, setActiveImage] = useState(0)
     const prefersReducedMotion = useReducedMotion()
+    const { t } = useLanguage()
 
     useEffect(() => {
         if (prefersReducedMotion) return
@@ -65,7 +67,7 @@ export function Hero() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.15, duration: 0.6 }}
                     >
-                        Trusted healthcare in Somalia
+                        {t("Trusted healthcare in Somalia")}
                     </motion.p>
 
                     <motion.h1
@@ -74,9 +76,9 @@ export function Hero() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.25, duration: 0.75, ease: "easeOut" }}
                     >
-                        <span className="block">Quality Care For You </span>
+                        <span className="block">{t("Quality Care For You")} </span>
                         <span className="block whitespace-nowrap">
-                            And <span className="text-[#10b981]">Your Family</span>
+                            {t("And")} <span className="text-[#10b981]">{t("Your Family")}</span>
                         </span>
                     </motion.h1>
 
@@ -86,8 +88,7 @@ export function Hero() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.4, duration: 0.7 }}
                     >
-                        Albirri Hospital provides compassionate, reliable, and accessible
-                        healthcare through experienced medical professionals.
+                        {t("Albirri Hospital provides compassionate, reliable, and accessible healthcare through experienced medical professionals.")}
                     </motion.p>
 
                     <motion.div
@@ -101,14 +102,14 @@ export function Hero() {
                             className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-3 font-semibold text-white transition hover:bg-emerald-600"
                         >
                             <CalendarDays className="size-5" aria-hidden="true" />
-                            Book an appointment
+                            {t("Book an appointment")}
                         </Link>
 
                         <Link
                             href="/services"
                             className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
                         >
-                            Explore our services
+                            {t("Explore our services")}
                             <ArrowRight className="size-5" aria-hidden="true" />
                         </Link>
                     </motion.div>
@@ -120,7 +121,7 @@ export function Hero() {
                     <button
                         key={src}
                         type="button"
-                        aria-label={`Show background image ${index + 1}`}
+                        aria-label={t(`Show background image ${index + 1}`)}
                         aria-current={index === activeImage}
                         onClick={() => setActiveImage(index)}
                         className={`h-2.5 rounded-full transition-all duration-500 ${

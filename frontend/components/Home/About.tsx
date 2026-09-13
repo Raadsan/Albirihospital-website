@@ -5,6 +5,7 @@ import Link from "next/link"
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowUpRight, Building2, CalendarDays, HeartHandshake, MapPin } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useLanguage } from "@/components/language-provider"
 
 const aboutImages = ["/images/1.png", "/images/2.png", "/images/3.png"]
 
@@ -17,6 +18,7 @@ const highlights = [
 export function About() {
     const [activeImage, setActiveImage] = useState(0)
     const prefersReducedMotion = useReducedMotion()
+    const { t } = useLanguage()
 
     useEffect(() => {
         if (prefersReducedMotion) return
@@ -68,8 +70,8 @@ export function About() {
 
                         <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between">
                             <div className="rounded-2xl border border-white/20 bg-white/15 px-4 py-3 text-white backdrop-blur-md">
-                                <p className="text-xs font-medium uppercase tracking-widest text-blue-100">Serving Somalia</p>
-                                <p className="mt-1 font-semibold">Mogadishu &amp; Adado</p>
+                                <p className="text-xs font-medium uppercase tracking-widest text-blue-100">{t("Serving Somalia")}</p>
+                                <p className="mt-1 font-semibold">{t("Mogadishu & Adado")}</p>
                             </div>
 
                             <div className="flex gap-2">
@@ -77,7 +79,7 @@ export function About() {
                                     <button
                                         key={src}
                                         type="button"
-                                        aria-label={`Show hospital image ${index + 1}`}
+                                        aria-label={t(`Show hospital image ${index + 1}`)}
                                         aria-current={index === activeImage}
                                         onClick={() => setActiveImage(index)}
                                         className={`h-2.5 rounded-full transition-all duration-500 ${
@@ -113,25 +115,22 @@ export function About() {
                         transition={{ delay: 0.1, duration: 0.5 }}
                         className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-600"
                     >
-                        About Albirri Hospital
+                        {t("About Albirri Hospital")}
                     </motion.p>
 
                     <h2 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-                        Modern healthcare,
-                        <span className="block text-[#1E40AF]">built around you.</span>
+                        {t("Modern healthcare,")}
+                        <span className="block text-[#1E40AF]">{t("built around you.")}</span>
                     </h2>
 
                     <div className="mt-6 space-y-4 text-base leading-8 text-slate-600 sm:text-lg">
                         <p>
-                            <strong className="font-semibold text-slate-900">Albirri Hospitals</strong> are modern health
-                            facilities located at KM14 Afgoi Road, Mogadishu, and in Adado Town, Galgaduud Region.
-                            Established on April 14, 2013, Albirri is a Somali-owned hospital registered under the
-                            Somali Federal Government and follows Ministry of Health guidelines.
+                            <strong className="font-semibold text-slate-900">{t("Albirri Hospitals")}</strong>{" "}
+                            {t("are modern health facilities located at KM14 Afgoi Road, Mogadishu, and in Adado Town, Galgaduud Region. Established on April 14, 2013, Albirri is a Somali-owned hospital registered under the Somali Federal Government and follows Ministry of Health guidelines.")}
                         </p>
                         <p>
-                            With advanced equipment and skilled staff, we offer quality care in diagnostics, treatment,
-                            and surgery. Every patient is treated with respect, privacy, and dignity under our motto:
-                            <em className="font-semibold text-[#1E40AF]"> We care.</em>
+                            {t("With advanced equipment and skilled staff, we offer quality care in diagnostics, treatment, and surgery. Every patient is treated with respect, privacy, and dignity under our motto:")}
+                            <em className="font-semibold text-[#1E40AF]"> {t("We care.")}</em>
                         </p>
                     </div>
 
@@ -149,8 +148,8 @@ export function About() {
                                     className="rounded-2xl border border-blue-100 bg-blue-50/60 p-3 transition-colors hover:bg-blue-50 sm:p-4"
                                 >
                                     <Icon aria-hidden="true" className="size-5 text-emerald-600" />
-                                    <p className="mt-3 text-base font-bold text-[#1E40AF] sm:text-lg">{item.value}</p>
-                                    <p className="mt-0.5 text-[11px] leading-4 text-slate-500 sm:text-xs">{item.label}</p>
+                                    <p className="mt-3 text-base font-bold text-[#1E40AF] sm:text-lg">{t(item.value)}</p>
+                                    <p className="mt-0.5 text-[11px] leading-4 text-slate-500 sm:text-xs">{t(item.label)}</p>
                                 </motion.div>
                             )
                         })}
@@ -167,7 +166,7 @@ export function About() {
                             href="/about/us"
                             className="group inline-flex items-center gap-2 rounded-full bg-[#1E40AF] px-6 py-3.5 font-semibold text-white shadow-lg shadow-blue-900/15 transition-all duration-300 hover:-translate-y-1 hover:bg-emerald-600 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200"
                         >
-                            Discover our story
+                            {t("Discover our story")}
                             <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                         </Link>
                     </motion.div>

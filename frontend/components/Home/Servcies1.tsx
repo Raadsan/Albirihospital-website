@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { motion, useReducedMotion } from "framer-motion"
+import { useLanguage } from "@/components/language-provider"
 import {
     Ambulance,
     CalendarCheck2,
@@ -53,6 +54,7 @@ const services = [
 
 export function Servcies1() {
     const prefersReducedMotion = useReducedMotion()
+    const { t } = useLanguage()
 
     return (
         <section className="relative overflow-hidden px-4 pb-20 pt-24 sm:px-6 lg:px-8">
@@ -87,14 +89,14 @@ export function Servcies1() {
                                     </span>
 
                                     <h3 className="mt-5 text-sm font-bold text-[#1E40AF] transition-colors duration-500 group-hover:text-white sm:text-base">
-                                        {service.title}
+                                        {t(service.title)}
                                     </h3>
                                     <p className="mt-1.5 text-xs leading-5 text-slate-500 transition-colors duration-500 group-hover:text-blue-100">
-                                        {service.description}
+                                        {t(service.description)}
                                     </p>
 
                                     <span className="mt-auto flex translate-y-2 items-center gap-1 pt-3 text-xs font-semibold text-white opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-                                        Learn more
+                                        {t("Learn more")}
                                         <ChevronRight aria-hidden="true" className="size-3.5" />
                                     </span>
                                 </Link>

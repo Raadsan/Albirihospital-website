@@ -4,6 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { motion, useReducedMotion } from "framer-motion"
 import { ChevronRight, Home } from "lucide-react"
+import { useLanguage } from "@/components/language-provider"
 
 type DepartmentBannerProps = {
   title: string
@@ -21,13 +22,14 @@ export function DepartmentBanner({
   breadcrumb,
 }: DepartmentBannerProps) {
   const prefersReducedMotion = useReducedMotion()
+  const { t } = useLanguage()
   const titleStart = accent ? title.slice(0, title.lastIndexOf(accent)) : title
 
   return (
     <section className="relative isolate flex min-h-72 items-center justify-center overflow-hidden px-4 py-16 sm:min-h-80 sm:px-6 lg:px-8">
       <Image
         src={image}
-        alt={imageAlt}
+        alt={t(imageAlt)}
         fill
         priority
         sizes="100vw"
@@ -61,15 +63,15 @@ export function DepartmentBanner({
           transition={{ delay: prefersReducedMotion ? 0 : 0.12, duration: 0.65 }}
           className="max-w-4xl text-4xl font-extrabold tracking-tight text-white drop-shadow-sm sm:text-5xl lg:text-6xl"
         >
-          {titleStart}
-          {accent && <span className="text-emerald-300"> {accent}</span>}
+          {t(titleStart)}
+          {accent && <span className="text-emerald-300"> {t(accent)}</span>}
         </motion.h1>
 
         <motion.nav
           initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: prefersReducedMotion ? 0 : 0.28, duration: 0.55 }}
-          aria-label="Breadcrumb"
+          aria-label={t("Breadcrumb")}
           className="mt-6 flex w-fit flex-wrap items-center justify-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-blue-100 shadow-lg backdrop-blur-md"
         >
           <Link
@@ -77,18 +79,18 @@ export function DepartmentBanner({
             className="inline-flex items-center gap-1.5 transition-colors hover:text-emerald-300 focus-visible:outline-none focus-visible:text-emerald-300"
           >
             <Home aria-hidden="true" className="size-3.5" />
-            Home
+            {t("Home")}
           </Link>
           <ChevronRight aria-hidden="true" className="size-3.5 text-blue-200/60" />
           <Link
             href="/departments"
             className="inline-flex items-center gap-1.5 transition-colors hover:text-emerald-300 focus-visible:outline-none focus-visible:text-emerald-300"
           >
-            Departments
+            {t("Departments")}
           </Link>
           <ChevronRight aria-hidden="true" className="size-3.5 text-blue-200/60" />
           <span aria-current="page" className="text-white font-semibold">
-            {breadcrumb}
+            {t(breadcrumb)}
           </span>
         </motion.nav>
       </motion.div>
