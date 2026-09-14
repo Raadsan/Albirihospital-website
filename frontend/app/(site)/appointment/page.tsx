@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { motion, useReducedMotion } from "framer-motion";
 import { Phone, CalendarDays, Clock3, Heart, Sparkles, CheckCircle2, UserRound } from "lucide-react";
 import { AboutBanner } from "@/components/About/AboutBanner";
+import api from "@/app/api/api";
 
 export default function AppointmentPage() {
   const prefersReducedMotion = useReducedMotion();
@@ -18,13 +19,19 @@ export default function AppointmentPage() {
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [confirmedId, setConfirmedId] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate booking API request
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setErrorMessage('');
+
+    try {
+      const response = await api.post("/appointments", formState);
+      if (response.data && response.data.data) {
+        setConfirmedId(response.data.data.id || '');
+      }
       setIsSubmitted(true);
       setFormState({
         name: '',
@@ -35,7 +42,13 @@ export default function AppointmentPage() {
         time: '',
         message: ''
       });
-    }, 1500);
+    } catch (err: any) {
+      console.error("Booking submission error:", err);
+      const msg = err.response?.data?.error || "Error submitting appointment request. Please check your details or call 4446.";
+      setErrorMessage(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const instructions = [
@@ -89,9 +102,17 @@ export default function AppointmentPage() {
                       <CheckCircle2 className="w-12 h-12" />
                     </div>
                     <h4 className="text-xl font-bold text-slate-900">Booking Request Sent!</h4>
-                    <p className="mt-2 text-slate-600 max-w-sm">We have received your details. One of our support staff will call you shortly to confirm the appointment.</p>
+                    {confirmedId && (
+                      <div className="mt-2 rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800 border border-emerald-200">
+                        Reference ID: <span className="font-mono">{confirmedId}</span>
+                      </div>
+                    )}
+                    <p className="mt-2 text-slate-600 max-w-sm">We have received your details. One of our hospital desk coordinators will contact you shortly to confirm the consultation slot.</p>
                     <button
-                      onClick={() => setIsSubmitted(false)}
+                      onClick={() => {
+                        setIsSubmitted(false);
+                        setConfirmedId('');
+                      }}
                       className="mt-6 rounded-xl bg-[#1e40af] px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-blue-800 transition-colors"
                     >
                       Book Another Appointment
@@ -99,6 +120,11 @@ export default function AppointmentPage() {
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
+                    {errorMessage && (
+                      <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">
+                        {errorMessage}
+                      </div>
+                    )}
                     <div className="grid gap-6 sm:grid-cols-2">
                       <div className="flex flex-col gap-2">
                         <label htmlFor="name" className="text-xs font-bold text-slate-800 uppercase tracking-wider">Patient Name</label>

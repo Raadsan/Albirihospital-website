@@ -4,46 +4,13 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { ArrowLeft, ArrowRight, Play, Video as VideoIcon } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { useLanguage } from "@/components/language-provider"
+import api from "@/app/api/api"
 
 type Video = {
     title: string
     doctor: string
     youtubeUrl: string
 }
-
-// Ku beddel linkiyadan muuqaalada YouTube-ka ee Al-Birri Hospital.
-const videos: Video[] = [
-    {
-        title: "Understanding High Blood Pressure",
-        doctor: "Al-Birri Medical Team",
-        youtubeUrl: "https://www.youtube.com/watch?v=ysz5S6PUM-U",
-    },
-    {
-        title: "Simple Steps for a Healthier Heart",
-        doctor: "Al-Birri Medical Team",
-        youtubeUrl: "https://www.youtube.com/watch?v=jNQXAC9IVRw",
-    },
-    {
-        title: "How to Protect Your Family's Health",
-        doctor: "Al-Birri Medical Team",
-        youtubeUrl: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
-    },
-    {
-        title: "Healthy Eating, Healthy Living",
-        doctor: "Al-Birri Medical Team",
-        youtubeUrl: "https://www.youtube.com/watch?v=ScMzIvxBSi4",
-    },
-    {
-        title: "The Importance of Regular Checkups",
-        doctor: "Al-Birri Medical Team",
-        youtubeUrl: "https://www.youtube.com/watch?v=M7lc1UVf-VE",
-    },
-    {
-        title: "Everyday Tips for Better Wellbeing",
-        doctor: "Al-Birri Medical Team",
-        youtubeUrl: "https://www.youtube.com/watch?v=YE7VzlLtp-4",
-    },
-]
 
 function getYouTubeId(url: string) {
     const match = url.match(
@@ -55,18 +22,23 @@ function getYouTubeId(url: string) {
 function VideoCard({ video }: { video: Video }) {
     const videoId = getYouTubeId(video.youtubeUrl)
     const { t } = useLanguage()
-
     return (
         <article className="group overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_18px_55px_-30px_rgba(15,23,42,0.35)]">
             <div className="relative aspect-video overflow-hidden bg-slate-950">
-                <iframe
-                    className="h-full w-full"
-                    src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0`}
-                    title={video.title}
-                    loading="lazy"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                />
+                {videoId ? (
+                    <iframe
+                        className="h-full w-full"
+                        src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0`}
+                        title={video.title}
+                        loading="lazy"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                    />
+                ) : (
+                    <div className="flex h-full w-full items-center justify-center text-slate-400">
+                        <VideoIcon className="size-12 opacity-50" />
+                    </div>
+                )}
             </div>
 
             <div className="p-5">
@@ -84,11 +56,27 @@ function VideoCard({ video }: { video: Video }) {
 }
 
 export function Watch() {
+    const [videos, setVideos] = useState<Video[]>([])
+    const [loading, setLoading] = useState(true)
     const [page, setPage] = useState(0)
     const [direction, setDirection] = useState(1)
     const [itemsPerPage, setItemsPerPage] = useState(3)
     const prefersReducedMotion = useReducedMotion()
     const { t } = useLanguage()
+
+    useEffect(() => {
+        api.get("/videos")
+            .then((res) => {
+                const list = res.data?.data || (Array.isArray(res.data) ? res.data : [])
+                setVideos(list)
+            })
+            .catch((err) => {
+                console.warn("Could not load dynamic videos:", err)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+    }, [])
 
     useEffect(() => {
         const updateItemsPerPage = () => {
@@ -100,12 +88,12 @@ export function Watch() {
         return () => window.removeEventListener("resize", updateItemsPerPage)
     }, [])
 
-    const pageCount = Math.ceil(videos.length / itemsPerPage)
+    const pageCount = Math.max(1, Math.ceil(videos.length / itemsPerPage))
     const activePage = page % pageCount
     const visibleVideos = useMemo(() => {
         const start = activePage * itemsPerPage
         return videos.slice(start, start + itemsPerPage)
-    }, [activePage, itemsPerPage])
+    }, [activePage, itemsPerPage, videos])
 
     useEffect(() => {
         if (prefersReducedMotion || pageCount <= 1) return
@@ -144,71 +132,91 @@ export function Watch() {
                     </p>
                 </motion.div>
 
-                <div className="relative min-h-[370px]">
-                    <AnimatePresence mode="wait" initial={false} custom={direction}>
-                        <motion.div
-                            key={`${itemsPerPage}-${activePage}`}
-                            custom={direction}
-                            initial={
-                                prefersReducedMotion
-                                    ? { opacity: 0 }
-                                    : { opacity: 0, x: direction * 70 }
-                            }
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={
-                                prefersReducedMotion
-                                    ? { opacity: 0 }
-                                    : { opacity: 0, x: direction * -70 }
-                            }
-                            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                        >
-                            {visibleVideos.map((video) => (
-                                <VideoCard key={video.youtubeUrl} video={video} />
-                            ))}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
-
-                <div className="mt-9 flex items-center justify-center gap-5">
-                    <button
-                        type="button"
-                        onClick={() => changePage(-1)}
-                        aria-label={t("Previous videos")}
-                        className="grid size-11 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-emerald-500 hover:bg-emerald-500 hover:text-white"
-                    >
-                        <ArrowLeft className="size-5" aria-hidden="true" />
-                    </button>
-
-                    <div className="flex gap-2" aria-label={t("Video pages")}>
-                        {Array.from({ length: pageCount }, (_, index) => (
-                            <button
-                                key={index}
-                                type="button"
-                                onClick={() => {
-                                    setDirection(index > activePage ? 1 : -1)
-                                    setPage(index)
-                                }}
-                                aria-label={t(`Go to video page ${index + 1}`)}
-                                aria-current={index === activePage}
-                                className={`h-2.5 rounded-full transition-all duration-300 ${
-                                    index === activePage
-                                        ? "w-8 bg-emerald-500"
-                                        : "w-2.5 bg-slate-300 hover:bg-slate-400"
-                                }`}
-                            />
+                {loading ? (
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="aspect-video min-h-[260px] rounded-3xl bg-slate-200 animate-pulse border border-slate-300" />
                         ))}
                     </div>
+                ) : videos.length === 0 ? (
+                    <div className="rounded-3xl border border-slate-200 bg-white p-12 text-center max-w-xl mx-auto shadow-sm">
+                        <VideoIcon className="size-12 text-emerald-600 mx-auto mb-3 opacity-50" />
+                        <h3 className="text-xl font-bold text-slate-800">{t("Health Videos Updating")}</h3>
+                        <p className="mt-2 text-sm text-slate-600">
+                            {t("Educational medical videos published in the admin dashboard will appear here.")}
+                        </p>
+                    </div>
+                ) : (
+                    <>
+                        <div className="relative min-h-[370px]">
+                            <AnimatePresence mode="wait" initial={false} custom={direction}>
+                                <motion.div
+                                    key={`${itemsPerPage}-${activePage}`}
+                                    custom={direction}
+                                    initial={
+                                        prefersReducedMotion
+                                            ? { opacity: 0 }
+                                            : { opacity: 0, x: direction * 70 }
+                                    }
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={
+                                        prefersReducedMotion
+                                            ? { opacity: 0 }
+                                            : { opacity: 0, x: direction * -70 }
+                                    }
+                                    transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                                    className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                                >
+                                    {visibleVideos.map((video) => (
+                                        <VideoCard key={video.youtubeUrl} video={video} />
+                                    ))}
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
 
-                    <button
-                        type="button"
-                        onClick={() => changePage(1)}
-                        aria-label={t("Next videos")}
-                        className="grid size-11 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-emerald-500 hover:bg-emerald-500 hover:text-white"
-                    >
-                        <ArrowRight className="size-5" aria-hidden="true" />
-                    </button>
-                </div>
+                        {pageCount > 1 && (
+                            <div className="mt-9 flex items-center justify-center gap-5">
+                                <button
+                                    type="button"
+                                    onClick={() => changePage(-1)}
+                                    aria-label={t("Previous videos")}
+                                    className="grid size-11 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-emerald-500 hover:bg-emerald-500 hover:text-white"
+                                >
+                                    <ArrowLeft className="size-5" aria-hidden="true" />
+                                </button>
+
+                                <div className="flex gap-2" aria-label={t("Video pages")}>
+                                    {Array.from({ length: pageCount }, (_, index) => (
+                                        <button
+                                            key={index}
+                                            type="button"
+                                            onClick={() => {
+                                                setDirection(index > activePage ? 1 : -1)
+                                                setPage(index)
+                                            }}
+                                            aria-label={t(`Go to video page ${index + 1}`)}
+                                            aria-current={index === activePage}
+                                            className={`h-2.5 rounded-full transition-all duration-300 ${
+                                                index === activePage
+                                                    ? "w-8 bg-emerald-500"
+                                                    : "w-2.5 bg-slate-300 hover:bg-slate-400"
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => changePage(1)}
+                                    aria-label={t("Next videos")}
+                                    className="grid size-11 place-items-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-emerald-500 hover:bg-emerald-500 hover:text-white"
+                                >
+                                    <ArrowRight className="size-5" aria-hidden="true" />
+                                </button>
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
         </section>
     )

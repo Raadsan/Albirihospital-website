@@ -16,7 +16,19 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, HeartPulseIcon } from "lucide-react"
+import {
+  LayoutDashboardIcon,
+  CalendarDaysIcon,
+  UsersIcon,
+  FileTextIcon,
+  VideoIcon,
+  GlobeIcon,
+  HeartPulseIcon,
+  Settings2Icon,
+  CircleHelpIcon,
+  SearchIcon,
+  Building2Icon,
+} from "lucide-react"
 
 const data = {
   user: {
@@ -28,99 +40,27 @@ const data = {
     {
       title: "Dashboard",
       url: "/admin/dashboard",
-      icon: (
-        <LayoutDashboardIcon
-        />
-      ),
+      icon: <LayoutDashboardIcon />,
     },
     {
-      title: "Lifecycle",
-      url: "#",
-      icon: (
-        <ListIcon
-        />
-      ),
+      title: "Appointments",
+      url: "/admin/dashboard/appointments",
+      icon: <CalendarDaysIcon />,
     },
     {
-      title: "Analytics",
-      url: "#",
-      icon: (
-        <ChartBarIcon
-        />
-      ),
+      title: "Doctors",
+      url: "/admin/dashboard/doctors",
+      icon: <UsersIcon />,
     },
     {
-      title: "Projects",
-      url: "#",
-      icon: (
-        <FolderIcon
-        />
-      ),
+      title: "News & Blogs",
+      url: "/admin/dashboard/blogs",
+      icon: <FileTextIcon />,
     },
     {
-      title: "Team",
-      url: "#",
-      icon: (
-        <UsersIcon
-        />
-      ),
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: (
-        <CameraIcon
-        />
-      ),
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: (
-        <FileTextIcon
-        />
-      ),
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: (
-        <FileTextIcon
-        />
-      ),
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
+      title: "Health Videos",
+      url: "/admin/dashboard/videos",
+      icon: <VideoIcon />,
     },
   ],
   navSecondary: [
@@ -151,28 +91,19 @@ const data = {
   ],
   documents: [
     {
-      name: "Data Library",
-      url: "#",
-      icon: (
-        <DatabaseIcon
-        />
-      ),
+      name: "Public Website",
+      url: "/",
+      icon: <GlobeIcon />,
     },
     {
-      name: "Reports",
-      url: "#",
-      icon: (
-        <FileChartColumnIcon
-        />
-      ),
+      name: "Appointment Form",
+      url: "/appointment",
+      icon: <HeartPulseIcon />,
     },
     {
-      name: "Word Assistant",
-      url: "#",
-      icon: (
-        <FileIcon
-        />
-      ),
+      name: "Departments",
+      url: "/departments",
+      icon: <Building2Icon />,
     },
   ],
 }

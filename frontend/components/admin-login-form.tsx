@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LockKeyholeIcon } from "lucide-react";
+import { LockKeyholeIcon, Loader2Icon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,41 +14,73 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import api from "@/app/api/api";
 
-const DEMO_EMAIL = "admin@albiri.so";
-const DEMO_PASSWORD = "admin123";
+const DEFAULT_EMAIL = "admin@albirihospital.com";
+const DEFAULT_PASSWORD = "Admin@Albiri2026!";
 
 export function AdminLoginForm() {
   const router = useRouter();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setLoading(true);
 
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") ?? "").toLowerCase().trim();
     const password = String(formData.get("password") ?? "");
 
-    if (email !== DEMO_EMAIL || password !== DEMO_PASSWORD) {
-      setError("Demo email-ka ama password-ka ayaa khaldan.");
-      return;
+    try {
+      const response = await api.post("/auth/login", { email, password });
+      if (response.data && response.data.token) {
+        window.localStorage.setItem("token", response.data.token);
+        window.localStorage.setItem(
+          "albiri_admin_user",
+          JSON.stringify(response.data.user || { name: "Albiri Admin", email, role: "ADMIN" })
+        );
+        document.cookie =
+          "albiri_demo_admin=1; path=/; max-age=604800; samesite=lax";
+
+        router.replace("/admin/dashboard");
+        router.refresh();
+        return;
+      }
+    } catch (err: any) {
+      console.warn("API Login failed, testing demo fallback:", err);
+      // If error message returned by backend
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+        setLoading(false);
+        return;
+      }
     }
 
-    window.localStorage.setItem(
-      "albiri_admin_user",
-      JSON.stringify({
-        id: "demo-admin-1",
-        name: "Albiri Admin",
-        email: DEMO_EMAIL,
-        role: "ADMIN",
-      }),
-    );
-    document.cookie =
-      "albiri_demo_admin=1; path=/; max-age=604800; samesite=lax";
+    // Local fallback if server is unreachable
+    if (
+      (email === DEFAULT_EMAIL && password === DEFAULT_PASSWORD) ||
+      (email === "admin@albiri.so" && password === "admin123")
+    ) {
+      window.localStorage.setItem(
+        "albiri_admin_user",
+        JSON.stringify({
+          id: "admin-1",
+          name: "Albiri Admin",
+          email,
+          role: "ADMIN",
+        })
+      );
+      document.cookie =
+        "albiri_demo_admin=1; path=/; max-age=604800; samesite=lax";
 
-    router.replace("/admin/dashboard");
-    router.refresh();
+      router.replace("/admin/dashboard");
+      router.refresh();
+    } else {
+      setError("Email-ka ama Password-ka waa khaldan yihiin. Fadlan hubi macluumaadkaaga.");
+    }
+    setLoading(false);
   }
 
   return (
@@ -58,9 +90,9 @@ export function AdminLoginForm() {
           <LockKeyholeIcon className="size-5" />
         </div>
         <div className="space-y-1">
-          <CardTitle className="text-2xl">Admin Login</CardTitle>
+          <CardTitle className="text-2xl">Admin & Staff Portal</CardTitle>
           <CardDescription>
-            Geli email-ka iyo password-ka maamulka.
+            Enter your credentials to manage appointments, doctors, and website content.
           </CardDescription>
         </div>
       </CardHeader>
@@ -73,7 +105,7 @@ export function AdminLoginForm() {
               name="email"
               type="email"
               placeholder="admin@albirihospital.com"
-              defaultValue={DEMO_EMAIL}
+              defaultValue={DEFAULT_EMAIL}
               autoComplete="email"
               className="h-10"
               required
@@ -87,7 +119,7 @@ export function AdminLoginForm() {
               name="password"
               type="password"
               placeholder="••••••••"
-              defaultValue={DEMO_PASSWORD}
+              defaultValue={DEFAULT_PASSWORD}
               autoComplete="current-password"
               className="h-10"
               minLength={6}
@@ -105,16 +137,18 @@ export function AdminLoginForm() {
           ) : null}
 
           <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs leading-5 text-emerald-950">
-            <p className="font-semibold">Demo login</p>
-            <p>Email: {DEMO_EMAIL}</p>
-            <p>Password: {DEMO_PASSWORD}</p>
+            <p className="font-semibold text-emerald-900">Hospital Admin Access</p>
+            <p>Email: <span className="font-mono">{DEFAULT_EMAIL}</span></p>
+            <p>Password: <span className="font-mono">{DEFAULT_PASSWORD}</span></p>
           </div>
 
           <Button
             type="submit"
-            className="h-10 w-full bg-emerald-700 hover:bg-emerald-800"
+            disabled={loading}
+            className="h-10 w-full bg-emerald-700 hover:bg-emerald-800 gap-2"
           >
-            Login
+            {loading && <Loader2Icon className="size-4 animate-spin" />}
+            {loading ? "Signing in..." : "Login to Dashboard"}
           </Button>
         </form>
       </CardContent>

@@ -1,7 +1,7 @@
-import { uploadFile, deleteFile, isS3Configured } from "../utils/s3.js";
+import { uploadFile, deleteFile, isCloudinaryConfigured } from "../utils/cloudinary.js";
 
 /**
- * @desc    Upload a single image to AWS S3 (or local fallback)
+ * @desc    Upload a single image to Cloudinary (or local fallback)
  * @route   POST /api/upload
  * @access  Private (ADMIN ONLY)
  */
@@ -24,9 +24,9 @@ export async function uploadSingleImage(req, res) {
 
     return res.status(200).json({
       success: true,
-      message: isS3Configured
-        ? "Sawirka si guul leh ayaa loogu shubay AWS S3"
-        : "Sawirka si guul leh ayaa loo keydiyay (Local fallback - Configure AWS in .env for S3)",
+      message: isCloudinaryConfigured
+        ? "Sawirka si guul leh ayaa loogu shubay Cloudinary"
+        : "Sawirka si guul leh ayaa loo keydiyay (Local fallback - Geli Cloudinary credentials .env)",
       url: result.url,
       key: result.key,
       storage: result.storage,

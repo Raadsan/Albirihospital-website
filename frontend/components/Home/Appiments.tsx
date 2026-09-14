@@ -1,8 +1,12 @@
 "use client"
 
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { motion, useReducedMotion } from "framer-motion"
-import { ArrowRight, CalendarDays, Clock3, Phone, UserRound } from "lucide-react"
+import { ArrowRight, CalendarDays, Clock3, Loader2, Phone, UserRound, CheckCircle2 } from "lucide-react"
 import { useLanguage } from "@/components/language-provider"
+import api from "@/app/api/api"
+import { toast } from "sonner"
 
 const fields = [
     { id: "name", label: "Name", placeholder: "Your name", type: "text", icon: UserRound, autoComplete: "name" },
@@ -14,61 +18,117 @@ const fields = [
 export function Appiments() {
     const prefersReducedMotion = useReducedMotion()
     const { t } = useLanguage()
+    const router = useRouter()
+    const [submitting, setSubmitting] = useState(false)
+    const [submitted, setSubmitted] = useState(false)
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        setSubmitting(true)
+
+        const formData = new FormData(e.currentTarget)
+        const payload = {
+            name: String(formData.get("name") || ""),
+            phone: String(formData.get("phone") || ""),
+            date: String(formData.get("date") || ""),
+            time: String(formData.get("time") || ""),
+            department: "general",
+        }
+
+        try {
+            await api.post("/appointments", payload)
+            setSubmitted(true)
+            toast.success("Balanta si guul leh ayaa loo qabtay! (Appointment requested successfully)")
+        } catch (err: any) {
+            console.error("Home booking error:", err)
+            // Redirect to appointment page as fallback
+            router.push(`/appointment?name=${encodeURIComponent(payload.name)}&phone=${encodeURIComponent(payload.phone)}`)
+        } finally {
+            setSubmitting(false)
+        }
+    }
 
     return (
         <section aria-label={t("Quick appointment booking")} className="relative z-20 mx-auto -mt-10 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-            <motion.form
-                action="/appointment"
-                method="get"
-                initial={prefersReducedMotion ? false : { opacity: 0, y: 45, scale: 0.97 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true, amount: 0.25 }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                className="grid gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-[0_18px_55px_rgba(15,23,42,0.16)] sm:p-5 md:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] lg:items-end lg:gap-2"
-            >
-                {fields.map((field, index) => {
-                    const Icon = field.icon
-                    return (
-                        <motion.label
-                            key={field.id}
-                            htmlFor={field.id}
-                            initial={prefersReducedMotion ? false : { opacity: 0, x: -18 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.12 + index * 0.08, duration: 0.45 }}
-                            className="group flex min-w-0 flex-col gap-2 rounded-xl border border-transparent px-3 py-2 transition-colors focus-within:border-blue-100 focus-within:bg-blue-50/50 hover:bg-slate-50"
-                        >
-                            <span className="text-xs font-semibold text-slate-800">{t(field.label)}</span>
-                            <span className="flex items-center gap-2">
-                                <Icon aria-hidden="true" className="size-4 shrink-0 text-blue-700 transition-transform group-focus-within:scale-110" />
-                                <input
-                                    id={field.id}
-                                    name={field.id}
-                                    type={field.type}
-                                    placeholder={field.placeholder ? t(field.placeholder) : ""}
-                                    autoComplete={field.autoComplete}
-                                    required
-                                    className="min-w-0 flex-1 bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-                                />
-                            </span>
-                        </motion.label>
-                    )
-                })}
-
-                <motion.button
-                    type="submit"
-                    initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.02 }}
-                    whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.45, duration: 0.4 }}
-                    className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-blue-700 px-6 text-sm font-semibold whitespace-nowrap text-white shadow-lg shadow-blue-700/20 transition-colors hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 md:col-span-2 lg:col-span-1 lg:mt-0"
+            {submitted ? (
+                <div className="flex items-center justify-between gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 shadow-lg">
+                    <div className="flex items-center gap-3">
+                        <CheckCircle2 className="size-6 text-emerald-600 shrink-0" />
+                        <div>
+                            <p className="font-bold text-emerald-900">{t("Appointment Request Received!")}</p>
+                            <p className="text-xs text-emerald-700">{t("Our team will call you shortly to confirm your visit.")}</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => setSubmitted(false)}
+                        className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-700"
+                    >
+                        {t("Book Another")}
+                    </button>
+                </div>
+            ) : (
+                <motion.form
+                    onSubmit={handleSubmit}
+                    initial={prefersReducedMotion ? false : { opacity: 0, y: 45, scale: 0.97 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, amount: 0.25 }}
+                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                    className="grid gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-[0_18px_55px_rgba(15,23,42,0.16)] sm:p-5 md:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] lg:items-end lg:gap-2"
                 >
-                    {t("Book an appointment")}
-                    <ArrowRight aria-hidden="true" className="size-4" />
-                </motion.button>
-            </motion.form>
+                    {fields.map((field, index) => {
+                        const Icon = field.icon
+                        return (
+                            <motion.label
+                                key={field.id}
+                                htmlFor={field.id}
+                                initial={prefersReducedMotion ? false : { opacity: 0, x: -18 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.12 + index * 0.08, duration: 0.45 }}
+                                className="group flex min-w-0 flex-col gap-2 rounded-xl border border-transparent px-3 py-2 transition-colors focus-within:border-blue-100 focus-within:bg-blue-50/50 hover:bg-slate-50"
+                            >
+                                <span className="text-xs font-semibold text-slate-800">{t(field.label)}</span>
+                                <span className="flex items-center gap-2">
+                                    <Icon aria-hidden="true" className="size-4 shrink-0 text-blue-700 transition-transform group-focus-within:scale-110" />
+                                    <input
+                                        id={field.id}
+                                        name={field.id}
+                                        type={field.type}
+                                        placeholder={field.placeholder ? t(field.placeholder) : ""}
+                                        autoComplete={field.autoComplete}
+                                        required
+                                        className="min-w-0 flex-1 bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                                    />
+                                </span>
+                            </motion.label>
+                        )
+                    })}
+
+                    <motion.button
+                        type="submit"
+                        disabled={submitting}
+                        initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.02 }}
+                        whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.45, duration: 0.4 }}
+                        className="mt-1 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-blue-700 px-6 text-sm font-semibold whitespace-nowrap text-white shadow-lg shadow-blue-700/20 transition-colors hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-200 disabled:opacity-60 md:col-span-2 lg:col-span-1 lg:mt-0"
+                    >
+                        {submitting ? (
+                            <>
+                                <Loader2 className="size-4 animate-spin" />
+                                <span>Booking...</span>
+                            </>
+                        ) : (
+                            <>
+                                {t("Book an appointment")}
+                                <ArrowRight aria-hidden="true" className="size-4" />
+                            </>
+                        )}
+                    </motion.button>
+                </motion.form>
+            )}
         </section>
     )
 }

@@ -126,15 +126,15 @@ const chartData = [
 ]
 
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
+  patients: {
+    label: "Patients",
   },
   desktop: {
-    label: "Desktop",
+    label: "Outpatient",
     color: "var(--primary)",
   },
   mobile: {
-    label: "Mobile",
+    label: "Inpatient",
     color: "var(--primary)",
   },
 } satisfies ChartConfig
@@ -159,12 +159,12 @@ export function ChartAreaInteractive() {
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Total Visitors</CardTitle>
+        <CardTitle>Patient Consultations & Admissions</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Total for the last 3 months
+            Outpatient & Inpatient volume for the selected timeframe
           </span>
-          <span className="@[540px]/card:hidden">Last 3 months</span>
+          <span className="@[540px]/card:hidden">Patient flow</span>
         </CardDescription>
         <CardAction>
           <ToggleGroup

@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { Badge } from "@/components/ui/badge"
 import {
   Card,
@@ -9,103 +10,137 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { TrendingUpIcon, TrendingDownIcon } from "lucide-react"
+import { CalendarDays, Stethoscope, Newspaper, Video, TrendingUpIcon } from "lucide-react"
+import api from "@/app/api/api"
 
 export function SectionCards() {
+  const [stats, setStats] = React.useState({
+    appointments: 0,
+    doctors: 0,
+    blogs: 0,
+    videos: 0,
+  })
+  const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    Promise.allSettled([
+      api.get("/appointments"),
+      api.get("/doctors"),
+      api.get("/blogs"),
+      api.get("/videos"),
+    ]).then(([apptRes, docRes, blogRes, vidRes]) => {
+      const getCount = (res: PromiseSettledResult<any>) => {
+        if (res.status === "fulfilled" && res.value?.data) {
+          const d = res.value.data
+          if (typeof d.count === "number") return d.count
+          if (Array.isArray(d.data)) return d.data.length
+          if (Array.isArray(d)) return d.length
+        }
+        return 0
+      }
+
+      setStats({
+        appointments: getCount(apptRes),
+        doctors: getCount(docRes),
+        blogs: getCount(blogRes),
+        videos: getCount(vidRes),
+      })
+      setLoading(false)
+    })
+  }, [])
+
   return (
     <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
+      {/* Appointments Card */}
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Total Revenue</CardDescription>
+          <CardDescription>Appointments Received</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            $1,250.00
+            {loading ? "..." : stats.appointments}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon
-              />
-              +12.5%
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+              <CalendarDays className="size-3.5 mr-1" />
+              Live DB
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month{" "}
-            <TrendingUpIcon className="size-4" />
+            Active patient booking requests
           </div>
           <div className="text-muted-foreground">
-            Visitors for the last 6 months
+            Directly from website form
           </div>
         </CardFooter>
       </Card>
+
+      {/* Doctors Card */}
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>New Customers</CardDescription>
+          <CardDescription>Registered Specialists</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            1,234
+            {loading ? "..." : stats.doctors}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingDownIcon
-              />
-              -20%
+            <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+              <Stethoscope className="size-3.5 mr-1" />
+              Active
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Down 20% this period{" "}
-            <TrendingDownIcon className="size-4" />
+            Active medical practitioners
           </div>
-          <div className="text-muted-foreground">
-            Acquisition needs attention
-          </div>
+          <div className="text-muted-foreground">Managed via Dashboard</div>
         </CardFooter>
       </Card>
+
+      {/* Blogs Card */}
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Active Accounts</CardDescription>
+          <CardDescription>Published Articles</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            45,678
+            {loading ? "..." : stats.blogs}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon
-              />
-              +12.5%
+            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+              <Newspaper className="size-3.5 mr-1" />
+              Articles
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Strong user retention{" "}
-            <TrendingUpIcon className="size-4" />
+            Hospital health updates
           </div>
-          <div className="text-muted-foreground">Engagement exceed targets</div>
+          <div className="text-muted-foreground">Visible on public site</div>
         </CardFooter>
       </Card>
+
+      {/* Videos Card */}
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Growth Rate</CardDescription>
+          <CardDescription>Health Education Videos</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            4.5%
+            {loading ? "..." : stats.videos}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon
-              />
-              +4.5%
+            <Badge variant="outline" className="bg-rose-50 text-rose-700 border-rose-200">
+              <Video className="size-3.5 mr-1" />
+              YouTube
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Steady performance increase{" "}
-            <TrendingUpIcon className="size-4" />
+            Published video sessions
           </div>
-          <div className="text-muted-foreground">Meets growth projections</div>
+          <div className="text-muted-foreground">Streaming on homepage</div>
         </CardFooter>
       </Card>
     </div>
   )
 }
+

@@ -256,21 +256,23 @@ const columns = columnHelper.columns([
     ),
   }),
   columnHelper.accessor("reviewer", {
-    header: "Reviewer",
+    header: "Attending Doctor",
     cell: ({ row }) => {
-      const isAssigned = row.original.reviewer !== "Assign reviewer"
+      const isAssigned = row.original.reviewer !== "Assign Doctor" && row.original.reviewer !== "Assign reviewer"
       if (isAssigned) {
         return row.original.reviewer
       }
       return (
         <>
           <Label htmlFor={`${row.original.id}-reviewer`} className="sr-only">
-            Reviewer
+            Attending Doctor
           </Label>
           <Select
             items={[
-              { label: "Eddie Lake", value: "Eddie Lake" },
-              { label: "Jamik Tashpulatov", value: "Jamik Tashpulatov" },
+              { label: "Dr. Ahmed Abdullahi", value: "Dr. Ahmed Abdullahi" },
+              { label: "Dr. Maryan Hassan", value: "Dr. Maryan Hassan" },
+              { label: "Dr. Khalid Mohamed", value: "Dr. Khalid Mohamed" },
+              { label: "Dr. Asha Nur", value: "Dr. Asha Nur" },
             ]}
           >
             <SelectTrigger
@@ -278,14 +280,14 @@ const columns = columnHelper.columns([
               size="sm"
               id={`${row.original.id}-reviewer`}
             >
-              <SelectValue placeholder="Assign reviewer" />
+              <SelectValue placeholder="Assign Doctor" />
             </SelectTrigger>
             <SelectContent align="end">
               <SelectGroup>
-                <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-                <SelectItem value="Jamik Tashpulatov">
-                  Jamik Tashpulatov
-                </SelectItem>
+                <SelectItem value="Dr. Ahmed Abdullahi">Dr. Ahmed Abdullahi</SelectItem>
+                <SelectItem value="Dr. Maryan Hassan">Dr. Maryan Hassan</SelectItem>
+                <SelectItem value="Dr. Khalid Mohamed">Dr. Khalid Mohamed</SelectItem>
+                <SelectItem value="Dr. Asha Nur">Dr. Asha Nur</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -416,10 +418,10 @@ export function DataTable({
         <Select
           defaultValue="outline"
           items={[
-            { label: "Outline", value: "outline" },
-            { label: "Past Performance", value: "past-performance" },
-            { label: "Key Personnel", value: "key-personnel" },
-            { label: "Focus Documents", value: "focus-documents" },
+            { label: "Clinical Operations", value: "outline" },
+            { label: "Patient Admissions", value: "past-performance" },
+            { label: "Specialist Rosters", value: "key-personnel" },
+            { label: "Emergency Logs", value: "focus-documents" },
           ]}
         >
           <SelectTrigger
@@ -431,22 +433,22 @@ export function DataTable({
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value="outline">Outline</SelectItem>
-              <SelectItem value="past-performance">Past Performance</SelectItem>
-              <SelectItem value="key-personnel">Key Personnel</SelectItem>
-              <SelectItem value="focus-documents">Focus Documents</SelectItem>
+              <SelectItem value="outline">Clinical Operations</SelectItem>
+              <SelectItem value="past-performance">Patient Admissions</SelectItem>
+              <SelectItem value="key-personnel">Specialist Rosters</SelectItem>
+              <SelectItem value="focus-documents">Emergency Logs</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
         <TabsList className="hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:bg-muted-foreground/30 **:data-[slot=badge]:px-1 @4xl/main:flex">
-          <TabsTrigger value="outline">Outline</TabsTrigger>
+          <TabsTrigger value="outline">Clinical Operations</TabsTrigger>
           <TabsTrigger value="past-performance">
-            Past Performance <Badge variant="secondary">3</Badge>
+            Patient Admissions <Badge variant="secondary">14</Badge>
           </TabsTrigger>
           <TabsTrigger value="key-personnel">
-            Key Personnel <Badge variant="secondary">2</Badge>
+            Specialist Rosters <Badge variant="secondary">8</Badge>
           </TabsTrigger>
-          <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
+          <TabsTrigger value="focus-documents">Emergency Logs</TabsTrigger>
         </TabsList>
         <div className="flex items-center gap-2">
           <DropdownMenu>

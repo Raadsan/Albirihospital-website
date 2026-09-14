@@ -5,9 +5,22 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "**",
+      },
+      {
+        protocol: "http",
+        hostname: "**",
       },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: "/doctors",
+        destination: "/about/doctors",
+        permanent: true,
+      },
+    ];
   },
 };
 
