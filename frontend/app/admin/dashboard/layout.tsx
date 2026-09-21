@@ -13,5 +13,5 @@ export default async function AdminDashboardLayout({
     redirect("/admin/login");
   }
 
-  return children;
+  return <div className="admin-dashboard">{children}</div>;
 }

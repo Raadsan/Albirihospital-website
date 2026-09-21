@@ -7,12 +7,16 @@ import { prisma } from "../db.js";
  */
 export async function getDoctors(req, res) {
   try {
-    const { search, department, specialty, available } = req.query;
+    const { search, department, specialty, available, featured, limit } = req.query;
 
     const where = {};
 
     if (available !== undefined) {
       where.available = available === "true";
+    }
+
+    if (featured !== undefined) {
+      where.featured = featured === "true";
     }
 
     if (department) {
@@ -33,6 +37,7 @@ export async function getDoctors(req, res) {
 
     const doctors = await prisma.doctor.findMany({
       where,
+      take: limit ? Math.max(1, Math.min(Number(limit) || 3, 50)) : undefined,
       orderBy: { createdAt: "asc" },
     });
 
@@ -100,6 +105,7 @@ export async function createDoctor(req, res) {
       department,
       experience,
       available = true,
+      featured = false,
     } = req.body;
 
     if (!name || !title || !specialty || !image) {
@@ -107,6 +113,16 @@ export async function createDoctor(req, res) {
         success: false,
         error: "Fadlan buuxi magaca, title-ka, takhasuska, iyo sawirka (Name, title, specialty, and image are required)",
       });
+    }
+
+    if (featured) {
+      const featuredCount = await prisma.doctor.count({ where: { featured: true } });
+      if (featuredCount >= 3) {
+        return res.status(409).json({
+          success: false,
+          error: "Homepage-ka waxaa lagu soo bandhigi karaa ugu badnaan 3 dhakhtar.",
+        });
+      }
     }
 
     const doctor = await prisma.doctor.create({
@@ -120,6 +136,7 @@ export async function createDoctor(req, res) {
         department: department ? department.trim().toLowerCase() : null,
         experience: experience ? experience.trim() : null,
         available: Boolean(available),
+        featured: Boolean(featured),
       },
     });
 
@@ -155,6 +172,16 @@ export async function updateDoctor(req, res) {
       });
     }
 
+    if (updateData.featured === true && !existing.featured) {
+      const featuredCount = await prisma.doctor.count({ where: { featured: true } });
+      if (featuredCount >= 3) {
+        return res.status(409).json({
+          success: false,
+          error: "Homepage-ka waxaa lagu soo bandhigi karaa ugu badnaan 3 dhakhtar.",
+        });
+      }
+    }
+
     // Clean data
     if (updateData.name) updateData.name = updateData.name.trim();
     if (updateData.title) updateData.title = updateData.title.trim();
@@ -162,6 +189,8 @@ export async function updateDoctor(req, res) {
     if (updateData.badge) updateData.badge = updateData.badge.trim();
     if (updateData.image) updateData.image = updateData.image.trim();
     if (updateData.department) updateData.department = updateData.department.trim().toLowerCase();
+    if (updateData.details === "") updateData.details = null;
+    if (updateData.experience === "") updateData.experience = null;
 
     const updated = await prisma.doctor.update({
       where: { id },

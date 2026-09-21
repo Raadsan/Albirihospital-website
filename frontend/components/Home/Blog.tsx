@@ -20,6 +20,17 @@ export interface BlogPost {
     href: string
 }
 
+type BlogApiItem = {
+    id: string
+    title: string
+    slug?: string
+    excerpt?: string
+    content?: string
+    image?: string
+    category?: string
+    createdAt?: string
+}
+
 export function Blog() {
     const prefersReducedMotion = useReducedMotion()
     const { t } = useLanguage()
@@ -27,10 +38,10 @@ export function Blog() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        api.get("/blogs")
+        api.get("/blogs?limit=3")
             .then((res) => {
                 const data = res.data?.data || (Array.isArray(res.data) ? res.data : [])
-                const mapped = data.map((b: any) => ({
+                const mapped = data.map((b: BlogApiItem) => ({
                     id: b.id,
                     title: b.title,
                     slug: b.slug,

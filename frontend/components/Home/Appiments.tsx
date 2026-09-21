@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowRight, CalendarDays, Clock3, Loader2, Phone, UserRound, CheckCircle2 } from "lucide-react"
 import { useLanguage } from "@/components/language-provider"
 import api from "@/app/api/api"
 import { toast } from "sonner"
+import { getApiErrorMessage } from "@/lib/api-error"
 
 const fields = [
     { id: "name", label: "Name", placeholder: "Your name", type: "text", icon: UserRound, autoComplete: "name" },
@@ -18,13 +18,15 @@ const fields = [
 export function Appiments() {
     const prefersReducedMotion = useReducedMotion()
     const { t } = useLanguage()
-    const router = useRouter()
     const [submitting, setSubmitting] = useState(false)
     const [submitted, setSubmitted] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        const form = e.currentTarget
         setSubmitting(true)
+        setErrorMessage("")
 
         const formData = new FormData(e.currentTarget)
         const payload = {
@@ -38,11 +40,13 @@ export function Appiments() {
         try {
             await api.post("/appointments", payload)
             setSubmitted(true)
+            form.reset()
             toast.success("Balanta si guul leh ayaa loo qabtay! (Appointment requested successfully)")
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Home booking error:", err)
-            // Redirect to appointment page as fallback
-            router.push(`/appointment?name=${encodeURIComponent(payload.name)}&phone=${encodeURIComponent(payload.phone)}`)
+            const message = getApiErrorMessage(err, "Balanta lama dirin. Fadlan isku day mar kale ama wac 4446.")
+            setErrorMessage(message)
+            toast.error("Appointment request was not sent")
         } finally {
             setSubmitting(false)
         }
@@ -75,6 +79,12 @@ export function Appiments() {
                     transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                     className="grid gap-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-[0_18px_55px_rgba(15,23,42,0.16)] sm:p-5 md:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] lg:items-end lg:gap-2"
                 >
+                    {errorMessage ? (
+                        <div role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800 md:col-span-2 lg:col-span-5">
+                            {errorMessage}
+                        </div>
+                    ) : null}
+
                     {fields.map((field, index) => {
                         const Icon = field.icon
                         return (
@@ -96,8 +106,9 @@ export function Appiments() {
                                         type={field.type}
                                         placeholder={field.placeholder ? t(field.placeholder) : ""}
                                         autoComplete={field.autoComplete}
+                                        min={field.type === "date" ? new Date().toISOString().split("T")[0] : undefined}
                                         required
-                                        className="min-w-0 flex-1 bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                                        className="min-w-0 flex-1 bg-transparent text-sm font-medium text-slate-950 outline-none [color-scheme:light] placeholder:text-slate-500"
                                     />
                                 </span>
                             </motion.label>

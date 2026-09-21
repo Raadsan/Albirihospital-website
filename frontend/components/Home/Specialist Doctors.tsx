@@ -19,6 +19,7 @@ export interface DoctorItem {
     department?: string
     experience?: string
     available?: boolean
+    featured?: boolean
 }
 
 export function SpecialistDoctors() {
@@ -28,10 +29,10 @@ export function SpecialistDoctors() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        api.get("/doctors")
+        api.get("/doctors?featured=true&available=true&limit=3")
             .then((res) => {
                 const list = res.data?.data || (Array.isArray(res.data) ? res.data : [])
-                setDoctors(list)
+                setDoctors(list.slice(0, 3))
             })
             .catch((err) => {
                 console.warn("Could not load dynamic doctors:", err)

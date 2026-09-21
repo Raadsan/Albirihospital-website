@@ -34,6 +34,14 @@ function VideoCard({ video }: { video: Video }) {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowFullScreen
                     />
+                ) : video.youtubeUrl ? (
+                    <video
+                        className="h-full w-full object-cover"
+                        src={video.youtubeUrl}
+                        title={video.title}
+                        controls
+                        preload="metadata"
+                    />
                 ) : (
                     <div className="flex h-full w-full items-center justify-center text-slate-400">
                         <VideoIcon className="size-12 opacity-50" />

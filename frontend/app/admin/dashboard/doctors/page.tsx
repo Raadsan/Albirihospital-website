@@ -1,20 +1,20 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import {
   UserPlusIcon,
   SearchIcon,
   StethoscopeIcon,
-  CheckCircleIcon,
-  XCircleIcon,
   Trash2Icon,
-  SparklesIcon,
   BriefcaseIcon,
   BuildingIcon,
-  PhoneCallIcon,
   RefreshCwIcon,
   UploadCloudIcon,
   Loader2Icon,
+  PencilIcon,
+  StarIcon,
+  AlertCircleIcon,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -49,6 +49,7 @@ import {
 } from "@/components/ui/sheet"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import api from "@/app/api/api"
+import { getApiErrorMessage } from "@/lib/api-error"
 
 export interface Doctor {
   id: string
@@ -61,6 +62,20 @@ export interface Doctor {
   department?: string | null
   experience?: string | null
   available: boolean
+  featured: boolean
+}
+
+const emptyDoctorForm = {
+  name: "",
+  title: "Consultant Specialist",
+  specialty: "",
+  department: "General Medicine",
+  experience: "5+ Years",
+  badge: "Specialist",
+  image: "/images/Dr. Abdullahi Hussein Abdi.png",
+  details: "",
+  available: true,
+  featured: false,
 }
 
 export default function DoctorsPage() {
@@ -69,24 +84,17 @@ export default function DoctorsPage() {
   const [searchQuery, setSearchQuery] = React.useState("")
   const [departmentFilter, setDepartmentFilter] = React.useState("ALL")
   const [isSheetOpen, setIsSheetOpen] = React.useState(false)
+  const [editingDoctor, setEditingDoctor] = React.useState<Doctor | null>(null)
+  const [saving, setSaving] = React.useState(false)
+  const [loadError, setLoadError] = React.useState("")
 
-  // New doctor form state
-  const [formData, setFormData] = React.useState({
-    name: "",
-    title: "Consultant Specialist",
-    specialty: "",
-    department: "General Medicine",
-    experience: "5+ Years",
-    badge: "Specialist",
-    image: "/images/doctor1.png",
-    details: "",
-    available: true,
-  })
+  const [formData, setFormData] = React.useState(emptyDoctorForm)
 
   const [uploadingImage, setUploadingImage] = React.useState(false)
 
   const fetchDoctors = React.useCallback(async () => {
     setLoading(true)
+    setLoadError("")
     try {
       const response = await api.get("/doctors")
       if (response.data && Array.isArray(response.data.data)) {
@@ -94,16 +102,41 @@ export default function DoctorsPage() {
       } else if (Array.isArray(response.data)) {
         setDoctors(response.data)
       }
-    } catch (err) {
-      console.warn("Error fetching doctors:", err)
+    } catch (err: unknown) {
+      console.error("Error fetching doctors:", err)
+      setLoadError(getApiErrorMessage(err, "Doctors could not be loaded. Please refresh and try again."))
     } finally {
       setLoading(false)
     }
   }, [])
 
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDoctors()
   }, [fetchDoctors])
+
+  const openCreateDoctor = () => {
+    setEditingDoctor(null)
+    setFormData(emptyDoctorForm)
+    setIsSheetOpen(true)
+  }
+
+  const openEditDoctor = (doctor: Doctor) => {
+    setEditingDoctor(doctor)
+    setFormData({
+      name: doctor.name,
+      title: doctor.title,
+      specialty: doctor.specialty,
+      department: doctor.department || "General Medicine",
+      experience: doctor.experience || "",
+      badge: doctor.badge || "Specialist",
+      image: doctor.image,
+      details: doctor.details || "",
+      available: doctor.available,
+      featured: doctor.featured,
+    })
+    setIsSheetOpen(true)
+  }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -122,71 +155,79 @@ export default function DoctorsPage() {
         setFormData((prev) => ({ ...prev, image: response.data.url }))
         toast.success("Doctor photo uploaded to Cloudinary!")
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Image upload failed:", err)
-      toast.error(err.response?.data?.error || "Failed to upload image. You can also paste an image URL.")
+      toast.error(getApiErrorMessage(err, "Failed to upload image. You can also paste an image URL."))
     } finally {
       setUploadingImage(false)
     }
   }
 
-  const handleCreateDoctor = async (e: React.FormEvent) => {
+  const handleSaveDoctor = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name.trim() || !formData.specialty.trim()) {
       toast.error("Please enter the doctor's name and specialty.")
       return
     }
 
-    const newDoc: Doctor = {
-      id: `doc-${Date.now()}`,
-      ...formData,
-    }
-
+    setSaving(true)
     try {
-      const response = await api.post("/doctors", formData)
-      if (response.data?.data) {
-        setDoctors((prev) => [response.data.data, ...prev])
-      } else {
-        setDoctors((prev) => [newDoc, ...prev])
-      }
-    } catch (err: any) {
-      console.warn("Backend doctor creation fallback:", err)
-      setDoctors((prev) => [newDoc, ...prev])
-    }
+      const response = editingDoctor
+        ? await api.patch(`/doctors/${editingDoctor.id}`, formData)
+        : await api.post("/doctors", formData)
+      const savedDoctor = response.data?.data as Doctor | undefined
+      if (!savedDoctor) throw new Error("Doctor API returned no record")
 
-    setIsSheetOpen(false)
-    setFormData({
-      name: "",
-      title: "Consultant Specialist",
-      specialty: "",
-      department: "General Medicine",
-      experience: "5+ Years",
-      badge: "Specialist",
-      image: "/images/doctor1.png",
-      details: "",
-      available: true,
-    })
-    toast.success("New doctor successfully registered!")
+      setDoctors((prev) =>
+        editingDoctor
+          ? prev.map((doctor) => doctor.id === savedDoctor.id ? savedDoctor : doctor)
+          : [...prev, savedDoctor]
+      )
+      setIsSheetOpen(false)
+      setEditingDoctor(null)
+      setFormData(emptyDoctorForm)
+      toast.success(editingDoctor ? "Doctor details updated" : "New doctor registered")
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err, "The doctor could not be saved."))
+    } finally {
+      setSaving(false)
+    }
   }
 
   const toggleAvailability = async (id: string, current: boolean) => {
     try {
-      await api.patch(`/doctors/${id}`, { available: !current })
-    } catch {
-      // Offline fallback
+      const response = await api.patch(`/doctors/${id}`, { available: !current })
+      const updated = response.data?.data as Doctor | undefined
+      setDoctors((prev) => prev.map((d) => (d.id === id ? (updated || { ...d, available: !current }) : d)))
+      toast.success("Doctor availability updated")
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err, "Availability was not updated."))
     }
-    setDoctors((prev) =>
-      prev.map((d) => (d.id === id ? { ...d, available: !current } : d))
-    )
-    toast.success("Doctor availability updated")
+  }
+
+  const toggleFeatured = async (doctor: Doctor) => {
+    const featuredCount = doctors.filter((item) => item.featured).length
+    if (!doctor.featured && featuredCount >= 3) {
+      toast.error("Only three doctors can appear on the homepage. Remove one first.")
+      return
+    }
+    try {
+      const response = await api.patch(`/doctors/${doctor.id}`, { featured: !doctor.featured })
+      const updated = response.data?.data as Doctor | undefined
+      setDoctors((prev) => prev.map((item) => item.id === doctor.id ? (updated || { ...item, featured: !item.featured }) : item))
+      toast.success(doctor.featured ? "Doctor removed from homepage" : "Doctor added to homepage")
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err, "Homepage selection was not updated."))
+    }
   }
 
   const handleDeleteDoctor = async (id: string) => {
     if (!confirm("Are you sure you want to remove this doctor?")) return
     try {
       await api.delete(`/doctors/${id}`)
-    } catch {
-      // Offline fallback
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err, "The doctor could not be deleted."))
+      return
     }
     setDoctors((prev) => prev.filter((d) => d.id !== id))
     toast.success("Doctor successfully removed")
@@ -202,6 +243,7 @@ export default function DoctorsPage() {
       (doc.department && doc.department.toLowerCase() === departmentFilter.toLowerCase())
     return matchesSearch && matchesDept
   })
+  const featuredCount = doctors.filter((doctor) => doctor.featured).length
 
   return (
     <SidebarProvider
@@ -240,9 +282,12 @@ export default function DoctorsPage() {
                 </Button>
 
                 {/* Add Doctor Sheet */}
-                <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                <Sheet open={isSheetOpen} onOpenChange={(open) => {
+                  setIsSheetOpen(open)
+                  if (!open) setEditingDoctor(null)
+                }}>
                   <SheetTrigger render={
-                    <Button size="sm" className="gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white">
+                    <Button size="sm" onClick={openCreateDoctor} className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90">
                       <UserPlusIcon className="size-4" />
                       Add Doctor
                     </Button>
@@ -250,17 +295,19 @@ export default function DoctorsPage() {
                   <SheetContent className="w-full sm:max-w-2xl md:max-w-3xl overflow-y-auto p-6 sm:p-8">
                     <SheetHeader className="border-b border-border/60 pb-4">
                       <SheetTitle className="text-xl font-bold flex items-center gap-2.5 text-foreground">
-                        <span className="flex size-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                        <span className="flex size-8 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
                           <StethoscopeIcon className="size-4" />
                         </span>
-                        Add New Medical Specialist
+                        {editingDoctor ? "Edit Medical Specialist" : "Add New Medical Specialist"}
                       </SheetTitle>
                       <SheetDescription className="text-sm text-muted-foreground mt-1">
-                        Register practitioner credentials, specialty, and photo to publish directly to the hospital website.
+                        {editingDoctor
+                          ? "Update the practitioner profile and website details."
+                          : "Register practitioner credentials, specialty, and photo for the hospital website."}
                       </SheetDescription>
                     </SheetHeader>
 
-                    <form onSubmit={handleCreateDoctor} className="space-y-6 pt-5">
+                    <form onSubmit={handleSaveDoctor} className="space-y-6 pt-5">
                       {/* Row 1: Name & Specialty */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div className="space-y-2">
@@ -366,8 +413,8 @@ export default function DoctorsPage() {
                           <Label htmlFor="image" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                             Doctor Photograph
                           </Label>
-                          <span className="inline-flex items-center gap-1 text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                            Cloudinary Storage Active
+                          <span className="inline-flex items-center gap-1 rounded-full border border-secondary bg-secondary/55 px-2 py-0.5 text-xs font-medium text-secondary-foreground">
+                            Secure media storage
                           </span>
                         </div>
 
@@ -378,11 +425,11 @@ export default function DoctorsPage() {
                               className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-secondary px-4 py-2.5 text-xs font-semibold text-secondary-foreground hover:bg-secondary/80 transition-colors shadow-xs"
                             >
                               {uploadingImage ? (
-                                <Loader2Icon className="size-4 animate-spin text-emerald-600" />
+                                <Loader2Icon className="size-4 animate-spin text-primary" />
                               ) : (
                                 <UploadCloudIcon className="size-4 text-emerald-600" />
                               )}
-                              {uploadingImage ? "Uploading to Cloudinary..." : "Choose Image File"}
+                              {uploadingImage ? "Uploading..." : "Choose Image File"}
                             </label>
                             <input
                               id="photo-file"
@@ -400,10 +447,12 @@ export default function DoctorsPage() {
                           <div className="flex items-center gap-3">
                             {formData.image && (
                               <div className="relative size-12 shrink-0 overflow-hidden rounded-xl border border-border bg-muted shadow-xs">
-                                <img
+                                <Image
                                   src={formData.image}
                                   alt="Doctor preview"
-                                  className="h-full w-full object-cover"
+                                  fill
+                                  sizes="48px"
+                                  className="object-cover"
                                 />
                               </div>
                             )}
@@ -436,14 +485,36 @@ export default function DoctorsPage() {
                       {/* Submit */}
                       <Button
                         type="submit"
-                        className="w-full h-12 text-base font-semibold rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white shadow-md shadow-emerald-900/15 transition-all mt-4"
+                        disabled={saving || uploadingImage}
+                        className="mt-4 h-12 w-full rounded-xl bg-primary text-base font-semibold text-primary-foreground shadow-md shadow-blue-950/15 transition-all hover:bg-primary/90"
                       >
-                        Save & Publish Doctor
+                        {saving ? <Loader2Icon className="size-4 animate-spin" /> : null}
+                        {saving ? "Saving..." : editingDoctor ? "Save Doctor Changes" : "Save Doctor"}
                       </Button>
                     </form>
                   </SheetContent>
                 </Sheet>
               </div>
+            </div>
+
+            {loadError ? (
+              <div role="alert" className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">
+                <AlertCircleIcon className="size-4 shrink-0" />
+                {loadError}
+              </div>
+            ) : null}
+
+            <div className="flex flex-col gap-2 rounded-xl border border-blue-100 bg-blue-50/80 px-4 py-3 text-sm text-slate-700 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2">
+                <span className="flex size-8 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
+                  <StarIcon className="size-4 fill-current" />
+                </span>
+                <div>
+                  <p className="font-semibold text-slate-900">Homepage Specialist Doctors</p>
+                  <p className="text-xs text-slate-600">Choose up to three doctors to display on the homepage.</p>
+                </div>
+              </div>
+              <Badge className="w-fit border-blue-200 bg-white text-primary hover:bg-white">{featuredCount} / 3 selected</Badge>
             </div>
 
             {/* Filter toolbar */}
@@ -476,12 +547,17 @@ export default function DoctorsPage() {
 
             {/* Doctors Grid */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {!loading && filteredDoctors.length === 0 ? (
+                <div className="col-span-full rounded-xl border border-dashed border-border bg-card px-6 py-12 text-center text-sm text-muted-foreground">
+                  No doctors match this view. Add a doctor or change the filters.
+                </div>
+              ) : null}
               {filteredDoctors.map((doc) => (
                 <Card key={doc.id} className="overflow-hidden border-border/70 shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
                   <CardHeader className="p-4 pb-2">
                     <div className="flex items-start justify-between gap-2">
-                      <div className="flex size-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-800 font-bold text-lg">
-                        {doc.name.replace("Dr. ", "").charAt(0)}
+                      <div className="size-14 overflow-hidden rounded-xl border border-blue-100 bg-secondary">
+                        <Image src={doc.image} alt="" width={56} height={56} className="h-full w-full object-cover object-top" />
                       </div>
                       <div className="flex flex-col items-end gap-1">
                         <Badge variant="secondary" className="text-[11px] font-medium">
@@ -498,10 +574,19 @@ export default function DoctorsPage() {
                           <span className={`size-1.5 rounded-full ${doc.available ? "bg-emerald-500" : "bg-zinc-400"}`} />
                           {doc.available ? "On Duty" : "Off Duty"}
                         </button>
+                        <button
+                          type="button"
+                          onClick={() => toggleFeatured(doc)}
+                          className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold transition-colors ${doc.featured ? "border-blue-200 bg-blue-50 text-primary" : "border-border bg-background text-muted-foreground hover:border-blue-200"}`}
+                          title={doc.featured ? "Remove from homepage" : "Show on homepage"}
+                        >
+                          <StarIcon className={`size-3 ${doc.featured ? "fill-current" : ""}`} />
+                          {doc.featured ? "Homepage" : "Feature"}
+                        </button>
                       </div>
                     </div>
                     <CardTitle className="text-base font-bold mt-2 text-foreground">{doc.name}</CardTitle>
-                    <CardDescription className="text-xs font-medium text-emerald-700">
+                    <CardDescription className="text-xs font-medium text-primary">
                       {doc.specialty}
                     </CardDescription>
                   </CardHeader>
@@ -533,15 +618,22 @@ export default function DoctorsPage() {
                     >
                       {doc.available ? "Set Off-duty" : "Set Available"}
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 size-8 p-0 text-muted-foreground hover:text-destructive"
-                      onClick={() => handleDeleteDoctor(doc.id)}
-                      title="Delete Doctor"
-                    >
-                      <Trash2Icon className="size-4" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button size="sm" variant="ghost" className="h-8 gap-1 px-2 text-xs text-primary" onClick={() => openEditDoctor(doc)}>
+                        <PencilIcon className="size-3.5" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 gap-1 px-2 text-xs text-muted-foreground hover:text-destructive"
+                        onClick={() => handleDeleteDoctor(doc.id)}
+                        title="Delete Doctor"
+                      >
+                        <Trash2Icon className="size-3.5" />
+                        Delete
+                      </Button>
+                    </div>
                   </CardFooter>
                 </Card>
               ))}

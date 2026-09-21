@@ -685,7 +685,7 @@ const chartConfig = {
   },
   mobile: {
     label: "Mobile",
-    color: "var(--primary)",
+    color: "var(--secondary)",
   },
 } satisfies ChartConfig
 function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {

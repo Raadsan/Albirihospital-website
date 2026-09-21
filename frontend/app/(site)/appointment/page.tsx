@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from "framer-motion";
-import { Phone, CalendarDays, Clock3, Heart, Sparkles, CheckCircle2, UserRound } from "lucide-react";
+import { Phone, CalendarDays, Heart, Sparkles, CheckCircle2 } from "lucide-react";
 import { AboutBanner } from "@/components/About/AboutBanner";
 import api from "@/app/api/api";
+import { getApiErrorMessage } from "@/lib/api-error";
 
 export default function AppointmentPage() {
   const prefersReducedMotion = useReducedMotion();
@@ -21,6 +22,7 @@ export default function AppointmentPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [confirmedId, setConfirmedId] = useState('');
+  const minimumDate = new Date().toISOString().split('T')[0];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,9 +44,9 @@ export default function AppointmentPage() {
         time: '',
         message: ''
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Booking submission error:", err);
-      const msg = err.response?.data?.error || "Error submitting appointment request. Please check your details or call 4446.";
+      const msg = getApiErrorMessage(err, "Error submitting appointment request. Please check your details or call 4446.");
       setErrorMessage(msg);
     } finally {
       setIsSubmitting(false);
@@ -188,10 +190,11 @@ export default function AppointmentPage() {
                         <input
                           type="date"
                           id="date"
+                          min={minimumDate}
                           required
                           value={formState.date}
                           onChange={(e) => setFormState({ ...formState, date: e.target.value })}
-                          className="rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition-all focus:border-[#1e40af] focus:ring-4 focus:ring-blue-100"
+                          className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-950 outline-none [color-scheme:light] transition-all focus:border-[#1e40af] focus:ring-4 focus:ring-blue-100"
                         />
                       </div>
                       <div className="flex flex-col gap-2">
@@ -202,7 +205,7 @@ export default function AppointmentPage() {
                           required
                           value={formState.time}
                           onChange={(e) => setFormState({ ...formState, time: e.target.value })}
-                          className="rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none transition-all focus:border-[#1e40af] focus:ring-4 focus:ring-blue-100"
+                          className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-950 outline-none [color-scheme:light] transition-all focus:border-[#1e40af] focus:ring-4 focus:ring-blue-100"
                         />
                       </div>
                     </div>

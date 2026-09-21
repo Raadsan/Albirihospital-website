@@ -4,7 +4,7 @@ import React, { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
-import { X, Check, HelpCircle, Calendar, ArrowRight, Stethoscope } from "lucide-react"
+import { X, Check, Calendar, ArrowRight, Stethoscope } from "lucide-react"
 
 interface InvestigationCategory {
   category: string

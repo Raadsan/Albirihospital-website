@@ -18,6 +18,15 @@ router.post(
   uploadSingleImage
 );
 
+// Upload a health video file (Admin only)
+router.post(
+  "/media",
+  protect,
+  authorizeRoles("ADMIN"),
+  upload.single("file"),
+  uploadSingleImage
+);
+
 // Upload multiple images (Admin only)
 router.post(
   "/multiple",

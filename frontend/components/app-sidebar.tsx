@@ -3,9 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 
-import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -22,12 +20,7 @@ import {
   UsersIcon,
   FileTextIcon,
   VideoIcon,
-  GlobeIcon,
   HeartPulseIcon,
-  Settings2Icon,
-  CircleHelpIcon,
-  SearchIcon,
-  Building2Icon,
 } from "lucide-react"
 
 const data = {
@@ -63,49 +56,6 @@ const data = {
       icon: <VideoIcon />,
     },
   ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: (
-        <Settings2Icon
-        />
-      ),
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: (
-        <CircleHelpIcon
-        />
-      ),
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: (
-        <SearchIcon
-        />
-      ),
-    },
-  ],
-  documents: [
-    {
-      name: "Public Website",
-      url: "/",
-      icon: <GlobeIcon />,
-    },
-    {
-      name: "Appointment Form",
-      url: "/appointment",
-      icon: <HeartPulseIcon />,
-    },
-    {
-      name: "Departments",
-      url: "/departments",
-      icon: <Building2Icon />,
-    },
-  ],
 }
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -117,7 +67,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:p-1.5!"
               render={<Link href="/admin/dashboard" />}
             >
-              <HeartPulseIcon className="size-5!" />
+              <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <HeartPulseIcon className="size-4!" />
+              </span>
               <span className="text-base font-semibold">Albiri Hospital</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -125,8 +77,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

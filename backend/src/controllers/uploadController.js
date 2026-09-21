@@ -10,7 +10,7 @@ export async function uploadSingleImage(req, res) {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        error: "Fadlan soo dooro sawir (No image file provided)",
+        error: "Fadlan soo dooro sawir ama video (No media file provided)",
       });
     }
 
@@ -25,8 +25,8 @@ export async function uploadSingleImage(req, res) {
     return res.status(200).json({
       success: true,
       message: isCloudinaryConfigured
-        ? "Sawirka si guul leh ayaa loogu shubay Cloudinary"
-        : "Sawirka si guul leh ayaa loo keydiyay (Local fallback - Geli Cloudinary credentials .env)",
+        ? "Faylka si guul leh ayaa loogu shubay Cloudinary"
+        : "Faylka si guul leh ayaa loo keydiyay",
       url: result.url,
       key: result.key,
       storage: result.storage,

@@ -11,7 +11,6 @@ import {
   RefreshCwIcon,
   SearchIcon,
   Trash2Icon,
-  UserIcon,
   XCircleIcon,
   EyeIcon,
   AlertCircleIcon,
@@ -46,6 +45,7 @@ import {
 } from "@/components/ui/sheet"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import api from "@/app/api/api"
+import { getApiErrorMessage } from "@/lib/api-error"
 
 export type AppointmentStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED"
 
@@ -70,10 +70,12 @@ export default function AppointmentsPage() {
   const [departmentFilter, setDepartmentFilter] = React.useState<string>("ALL")
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null)
   const [isSheetOpen, setIsSheetOpen] = React.useState(false)
+  const [loadError, setLoadError] = React.useState("")
 
   // Fetch real appointments from backend API if running
   const fetchAppointments = React.useCallback(async () => {
     setLoading(true)
+    setLoadError("")
     try {
       const response = await api.get("/appointments")
       if (response.data && Array.isArray(response.data.data)) {
@@ -81,14 +83,17 @@ export default function AppointmentsPage() {
       } else if (Array.isArray(response.data)) {
         setAppointments(response.data)
       }
-    } catch (err) {
-      console.warn("Could not fetch appointments from API, using local state:", err)
+    } catch (err: unknown) {
+      console.error("Could not fetch appointments:", err)
+      setLoadError(getApiErrorMessage(err, "Appointments could not be loaded. Please refresh and try again."))
     } finally {
       setLoading(false)
     }
   }, [])
 
   React.useEffect(() => {
+    // Fetching this client-side admin table is an intentional mount synchronization.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchAppointments()
   }, [fetchAppointments])
 
@@ -96,8 +101,9 @@ export default function AppointmentsPage() {
   const handleUpdateStatus = async (id: string, newStatus: AppointmentStatus) => {
     try {
       await api.patch(`/appointments/${id}/status`, { status: newStatus })
-    } catch {
-      // If offline or backend error, still update UI state locally
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err, "The appointment status was not updated."))
+      return
     }
     setAppointments((prev) =>
       prev.map((apt) => (apt.id === id ? { ...apt, status: newStatus } : apt))
@@ -113,8 +119,9 @@ export default function AppointmentsPage() {
     if (!confirm("Are you sure you want to delete this appointment?")) return
     try {
       await api.delete(`/appointments/${id}`)
-    } catch {
-      // Local fallback
+    } catch (err: unknown) {
+      toast.error(getApiErrorMessage(err, "The appointment could not be deleted."))
+      return
     }
     setAppointments((prev) => prev.filter((apt) => apt.id !== id))
     if (selectedAppointment?.id === id) {
@@ -194,6 +201,13 @@ export default function AppointmentsPage() {
             </div>
 
             {/* Quick Stat Cards */}
+            {loadError ? (
+              <div role="alert" className="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800">
+                <AlertCircleIcon className="size-4 shrink-0" />
+                {loadError}
+              </div>
+            ) : null}
+
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
               <Card className="border-border/60 shadow-xs">
                 <CardHeader className="pb-2">

@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { CalendarDays, Stethoscope, Newspaper, Video, TrendingUpIcon } from "lucide-react"
+import { CalendarDays, Stethoscope, Newspaper, Video } from "lucide-react"
 import api from "@/app/api/api"
 
 export function SectionCards() {
@@ -29,12 +29,12 @@ export function SectionCards() {
       api.get("/blogs"),
       api.get("/videos"),
     ]).then(([apptRes, docRes, blogRes, vidRes]) => {
-      const getCount = (res: PromiseSettledResult<any>) => {
+      const getCount = (res: PromiseSettledResult<{ data?: { count?: number; data?: unknown[] } | unknown[] }>) => {
         if (res.status === "fulfilled" && res.value?.data) {
           const d = res.value.data
+          if (Array.isArray(d)) return d.length
           if (typeof d.count === "number") return d.count
           if (Array.isArray(d.data)) return d.data.length
-          if (Array.isArray(d)) return d.length
         }
         return 0
       }
@@ -59,7 +59,7 @@ export function SectionCards() {
             {loading ? "..." : stats.appointments}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            <Badge variant="outline" className="border-blue-200 bg-blue-50 text-primary">
               <CalendarDays className="size-3.5 mr-1" />
               Live DB
             </Badge>
@@ -83,7 +83,7 @@ export function SectionCards() {
             {loading ? "..." : stats.doctors}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+            <Badge variant="outline" className="border-emerald-200 bg-secondary/60 text-secondary-foreground">
               <Stethoscope className="size-3.5 mr-1" />
               Active
             </Badge>
@@ -105,7 +105,7 @@ export function SectionCards() {
             {loading ? "..." : stats.blogs}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+            <Badge variant="outline" className="border-blue-200 bg-blue-50 text-primary">
               <Newspaper className="size-3.5 mr-1" />
               Articles
             </Badge>
@@ -127,9 +127,9 @@ export function SectionCards() {
             {loading ? "..." : stats.videos}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline" className="bg-rose-50 text-rose-700 border-rose-200">
+            <Badge variant="outline" className="border-emerald-200 bg-secondary/60 text-secondary-foreground">
               <Video className="size-3.5 mr-1" />
-              YouTube
+              Media
             </Badge>
           </CardAction>
         </CardHeader>
@@ -143,4 +143,3 @@ export function SectionCards() {
     </div>
   )
 }
-
