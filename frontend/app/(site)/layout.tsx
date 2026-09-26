@@ -4,6 +4,7 @@ import { Footer } from "@/components/Footer";
 import { LanguageProvider } from "@/components/language-provider";
 import { Navbar } from "@/components/Navbar";
 import { Tobbar } from "@/components/Tobbar";
+import { WhatsAppButton } from "@/components/WhatsAppButton";
 import type { Language } from "@/lib/i18n/translations";
 
 export default async function SiteLayout({
@@ -23,6 +24,7 @@ export default async function SiteLayout({
       </header>
       <main className="flex-1">{children}</main>
       <Footer />
+      <WhatsAppButton />
     </LanguageProvider>
   );
 }

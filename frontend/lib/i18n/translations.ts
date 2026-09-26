@@ -541,6 +541,15 @@ export const translations: Record<string, Translation> = {
   "July 18, 2026": { so: "18 Luulyo, 2026", ar: "18 يوليو 2026" },
   "July 12, 2026": { so: "12 Luulyo, 2026", ar: "12 يوليو 2026" },
   "July 05, 2026": { so: "05 Luulyo, 2026", ar: "05 يوليو 2026" },
+  "WhatsApp": { so: "WhatsApp", ar: "واتساب" },
+  "WhatsApp Chat": { so: "Wadahadalka WhatsApp", ar: "محادثة واتساب" },
+  "Chat on WhatsApp": { so: "Nagala soo xiriir WhatsApp", ar: "تواصل عبر واتساب" },
+  "Chat with Albirri Hospital": { so: "Kala hadal Isbitaalka Albirri", ar: "تحدث مع مستشفى البِرّي" },
+  "Online now": { so: "Khadka ku jira", ar: "متصل الآن" },
+  "Need help? Chat with us on WhatsApp": { so: "Ma u baahan tahay caawin? Nagala hadal WhatsApp", ar: "هل تحتاج مساعدة؟ تحدث معنا عبر واتساب" },
+  "Our team is available to assist you": { so: "Kooxdayadu waxay diyaar u tahay inay ku caawiso", ar: "فريقنا متاح لمساعدتك" },
+  "Follow Albirri Hospital on WhatsApp": { so: "Kala soco Isbitaalka Albirri WhatsApp", ar: "تابع مستشفى البِرّي على واتساب" },
+  "Direct WhatsApp Chat": { so: "Wadahadal Toos ah ee WhatsApp", ar: "محادثة مباشرة عبر واتساب" },
 }
 
 export const languageLabels: Record<Language, string> = {
