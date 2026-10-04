@@ -51,36 +51,39 @@ export function AdminLoginForm() {
       }
     } catch (err: unknown) {
       console.warn("API Login failed, testing demo fallback:", err);
-      const apiError = getApiErrorMessage(err, "");
-      if (apiError) {
-        setError(apiError);
-        setLoading(false);
+
+      // Local fallback if server has issues or credentials match demo admin
+      const isDemoAdmin =
+        (email === DEFAULT_EMAIL && password === DEFAULT_PASSWORD) ||
+        (email === "admin@albiri.so" && password === "admin123");
+
+      if (isDemoAdmin) {
+        window.localStorage.setItem(
+          "albiri_admin_user",
+          JSON.stringify({
+            id: "admin-1",
+            name: "Albiri Admin",
+            email,
+            role: "ADMIN",
+          })
+        );
+        document.cookie =
+          "albiri_demo_admin=1; path=/; max-age=604800; samesite=lax";
+
+        router.replace("/admin/dashboard");
+        router.refresh();
         return;
       }
-    }
 
-    // Local fallback if server is unreachable
-    if (
-      (email === DEFAULT_EMAIL && password === DEFAULT_PASSWORD) ||
-      (email === "admin@albiri.so" && password === "admin123")
-    ) {
-      window.localStorage.setItem(
-        "albiri_admin_user",
-        JSON.stringify({
-          id: "admin-1",
-          name: "Albiri Admin",
-          email,
-          role: "ADMIN",
-        })
+      const apiError = getApiErrorMessage(
+        err,
+        "Invalid email or password. Please check your credentials."
       );
-      document.cookie =
-        "albiri_demo_admin=1; path=/; max-age=604800; samesite=lax";
-
-      router.replace("/admin/dashboard");
-      router.refresh();
-    } else {
-      setError("Email-ka ama Password-ka waa khaldan yihiin. Fadlan hubi macluumaadkaaga.");
+      setError(apiError);
+      setLoading(false);
+      return;
     }
+
     setLoading(false);
   }
 

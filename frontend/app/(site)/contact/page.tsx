@@ -2,29 +2,43 @@
 
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from "framer-motion";
-import { Phone, MapPin, Clock3, Mail, Send, CheckCircle2, ArrowUpRight } from "lucide-react";
+import { Phone, MapPin, Clock3, Mail, Send, CheckCircle2, ArrowUpRight, Loader2 } from "lucide-react";
 import { AboutBanner } from "@/components/About/AboutBanner";
+import api from "@/app/api/api";
+import { toast } from "sonner";
+import { getApiErrorMessage } from "@/lib/api-error";
 
 export default function ContactPage() {
   const prefersReducedMotion = useReducedMotion();
   const [formState, setFormState] = useState({
     name: '',
     email: '',
+    phone: '',
     subject: '',
     message: ''
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API request
-    setTimeout(() => {
-      setIsSubmitting(false);
+    setErrorMessage('');
+
+    try {
+      await api.post("/contact", formState);
       setIsSubmitted(true);
-      setFormState({ name: '', email: '', subject: '', message: '' });
-    }, 1500);
+      setFormState({ name: '', email: '', phone: '', subject: '', message: '' });
+      toast.success("Fariintaada si guul leh ayaa loo diray! (Message sent successfully)");
+    } catch (err: unknown) {
+      console.error("Contact submit error:", err);
+      const msg = getApiErrorMessage(err, "Fariinta lama dirin. Fadlan hubi xogtaada ama wac 4446.");
+      setErrorMessage(msg);
+      toast.error(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfos = [
@@ -157,6 +171,11 @@ export default function ContactPage() {
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
+                    {errorMessage && (
+                      <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-medium text-rose-800">
+                        {errorMessage}
+                      </div>
+                    )}
                     <div className="grid gap-6 sm:grid-cols-2">
                       <div className="flex flex-col gap-2">
                         <label htmlFor="name" className="text-xs font-bold text-slate-800 uppercase tracking-wider">Full Name</label>
@@ -171,6 +190,20 @@ export default function ContactPage() {
                         />
                       </div>
                       <div className="flex flex-col gap-2">
+                        <label htmlFor="phone" className="text-xs font-bold text-slate-800 uppercase tracking-wider">Phone Number (Optional)</label>
+                        <input
+                          type="tel"
+                          id="phone"
+                          value={formState.phone}
+                          onChange={(e) => setFormState({ ...formState, phone: e.target.value })}
+                          placeholder="+252 61..."
+                          className="rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-[#1e40af] focus:ring-4 focus:ring-blue-100"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <div className="flex flex-col gap-2">
                         <label htmlFor="email" className="text-xs font-bold text-slate-800 uppercase tracking-wider">Email Address</label>
                         <input
                           type="email"
@@ -182,19 +215,18 @@ export default function ContactPage() {
                           className="rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-[#1e40af] focus:ring-4 focus:ring-blue-100"
                         />
                       </div>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <label htmlFor="subject" className="text-xs font-bold text-slate-800 uppercase tracking-wider">Subject</label>
-                      <input
-                        type="text"
-                        id="subject"
-                        required
-                        value={formState.subject}
-                        onChange={(e) => setFormState({ ...formState, subject: e.target.value })}
-                        placeholder="What is this regarding?"
-                        className="rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-[#1e40af] focus:ring-4 focus:ring-blue-100"
-                      />
+                      <div className="flex flex-col gap-2">
+                        <label htmlFor="subject" className="text-xs font-bold text-slate-800 uppercase tracking-wider">Subject</label>
+                        <input
+                          type="text"
+                          id="subject"
+                          required
+                          value={formState.subject}
+                          onChange={(e) => setFormState({ ...formState, subject: e.target.value })}
+                          placeholder="What is this regarding?"
+                          className="rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-[#1e40af] focus:ring-4 focus:ring-blue-100"
+                        />
+                      </div>
                     </div>
 
                     <div className="flex flex-col gap-2">
@@ -216,7 +248,10 @@ export default function ContactPage() {
                       className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#1e40af] px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-blue-700/20 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-100 disabled:bg-blue-400 disabled:cursor-not-allowed transition-all duration-300 transform active:scale-95"
                     >
                       {isSubmitting ? (
-                        <span>Sending...</span>
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Sending message...</span>
+                        </>
                       ) : (
                         <>
                           <span>Send Message</span>

@@ -21,6 +21,8 @@ import {
   FileTextIcon,
   VideoIcon,
   HeartPulseIcon,
+  MailIcon,
+  AwardIcon,
 } from "lucide-react"
 
 const data = {
@@ -41,9 +43,19 @@ const data = {
       icon: <CalendarDaysIcon />,
     },
     {
+      title: "Inquiries & Messages",
+      url: "/admin/dashboard/messages",
+      icon: <MailIcon />,
+    },
+    {
       title: "Doctors",
       url: "/admin/dashboard/doctors",
       icon: <UsersIcon />,
+    },
+    {
+      title: "Leadership Team",
+      url: "/admin/dashboard/leadership",
+      icon: <AwardIcon />,
     },
     {
       title: "News & Blogs",

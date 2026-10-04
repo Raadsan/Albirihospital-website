@@ -14,14 +14,14 @@ export async function register(req, res) {
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
-        error: "Fadlan soo gali magaca, email-ka, iyo password-ka (Name, email, and password required)",
+        error: "Name, email, and password are required.",
       });
     }
 
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
-        error: "Password-ku waa inuu ka koobnaadaa ugu yaraan 6 xaraf (Password must be at least 6 characters)",
+        error: "Password must be at least 6 characters long.",
       });
     }
 
@@ -35,7 +35,7 @@ export async function register(req, res) {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        error: "Email-kaan horay ayaa loo diiwaangeliyay (Email already registered)",
+        error: "This email address is already registered.",
       });
     }
 
@@ -49,7 +49,7 @@ export async function register(req, res) {
     if (role && !validRoles.includes(requestedRole)) {
       return res.status(400).json({
         success: false,
-        error: "Doorka user-ka (Role) waa inuu ahaadaa ADMIN ama RECEPTIONIST oo kaliya",
+        error: "User role must be either ADMIN or RECEPTIONIST.",
       });
     }
 
@@ -81,7 +81,7 @@ export async function register(req, res) {
 
     return res.status(201).json({
       success: true,
-      message: "User-ka si guul leh ayaa loo diiwaangeliyay",
+      message: "User registered successfully.",
       token,
       user,
     });
@@ -89,7 +89,7 @@ export async function register(req, res) {
     console.error("Register Error:", error);
     return res.status(500).json({
       success: false,
-      error: "Khalad ayaa dhacay markii la diiwaangelinayay user-ka (Server error)",
+      error: "An internal server error occurred during registration. Please try again.",
     });
   }
 }
@@ -106,7 +106,7 @@ export async function login(req, res) {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        error: "Fadlan soo gali email-ka iyo password-ka (Email and password are required)",
+        error: "Email and password are required.",
       });
     }
 
@@ -120,7 +120,7 @@ export async function login(req, res) {
     if (!user) {
       return res.status(401).json({
         success: false,
-        error: "Email-ka ama Password-ka waa qalad (Invalid email or password)",
+        error: "Invalid email or password.",
       });
     }
 
@@ -129,7 +129,7 @@ export async function login(req, res) {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        error: "Email-ka ama Password-ka waa qalad (Invalid email or password)",
+        error: "Invalid email or password.",
       });
     }
 
@@ -142,7 +142,7 @@ export async function login(req, res) {
 
     return res.status(200).json({
       success: true,
-      message: "Soo galid guul leh (Login successful)",
+      message: "Login successful.",
       token,
       user: {
         id: user.id,
@@ -156,7 +156,7 @@ export async function login(req, res) {
     console.error("Login Error:", error);
     return res.status(500).json({
       success: false,
-      error: "Khalad ayaa dhacay markii la galayay (Server error during login)",
+      error: "Server error during login. Please try again later.",
     });
   }
 }
@@ -177,7 +177,7 @@ export async function getMe(req, res) {
     console.error("GetMe Error:", error);
     return res.status(500).json({
       success: false,
-      error: "Khalad ayaa dhacay markii la keenayay xogta (Server error)",
+      error: "Server error retrieving profile.",
     });
   }
 }

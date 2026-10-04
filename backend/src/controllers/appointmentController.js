@@ -9,7 +9,7 @@ const VALID_STATUSES = ["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"];
  */
 export async function createAppointment(req, res) {
   try {
-    const { name, phone, email, department, date, time, message } = req.body;
+    const { name, phone, email, department, doctorId, doctorName, date, time, message } = req.body;
 
     // Validation
     if (!name || !phone || !date || !time) {
@@ -32,6 +32,8 @@ export async function createAppointment(req, res) {
         phone: phone.trim(),
         email: email ? email.trim().toLowerCase() : null,
         department: department ? department.trim().toLowerCase() : "general",
+        doctorId: doctorId ? doctorId.trim() : null,
+        doctorName: doctorName ? doctorName.trim() : null,
         date: date.trim(),
         time: time.trim(),
         message: message ? message.trim() : null,

@@ -36,6 +36,8 @@ model Appointment {
   phone      String
   email      String?
   department String            @default("general")
+  doctorId   String?
+  doctorName String?
   date       String
   time       String
   message    String?           @db.Text
@@ -98,14 +100,37 @@ model Leadershipes {
   id          String   @id @default(uuid())
   name        String
   title       String
+  role        String?
   specialty   String
   badge       String   @default("Specialist")
   image       String   @db.Text
   details     String?  @db.Text
-  experience  String?
+  experience  String?  @db.Text
+  education   String?  @db.Text
+  order       Int      @default(0)
   available   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@map("leadershipes")
+}
+
+enum MessageStatus {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+model ContactMessage {
+  id        String        @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String        @db.Text
+  status    MessageStatus @default(UNREAD)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@map("contact_messages")
 }

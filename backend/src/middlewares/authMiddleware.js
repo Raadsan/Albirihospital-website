@@ -35,7 +35,7 @@ export async function protect(req, res, next) {
 
     return res.status(401).json({
       success: false,
-      error: "Ma haysatid ogolaansho (No token provided)",
+      error: "Unauthorized: No token provided.",
     });
   }
 
@@ -66,7 +66,7 @@ export async function protect(req, res, next) {
       }
       return res.status(401).json({
         success: false,
-        error: "User-ka token-kaan leh lama helin (User not found)",
+        error: "Unauthorized: User account not found.",
       });
     }
 
@@ -87,10 +87,11 @@ export async function protect(req, res, next) {
 
     return res.status(401).json({
       success: false,
-      error: "Token-ku waa dhacay ama waa qalad (Invalid or expired token)",
+      error: "Unauthorized: Invalid or expired token.",
     });
   }
 }
+
 
 /**
  * Middleware to restrict access based on roles
@@ -101,7 +102,7 @@ export function authorizeRoles(...roles) {
     if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-        error: "Ma haysatid awood aad ku gasho boggan (Access denied: insufficient permissions)",
+        error: "Forbidden: You do not have permission to access this resource.",
       });
     }
     next();

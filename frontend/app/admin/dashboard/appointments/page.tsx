@@ -55,6 +55,8 @@ export interface Appointment {
   phone: string
   email?: string | null
   department: string
+  doctorId?: string | null
+  doctorName?: string | null
   date: string
   time: string
   message?: string | null
@@ -327,9 +329,16 @@ export default function AppointmentsPage() {
                             </div>
                           </td>
                           <td className="px-4 py-3">
-                            <Badge variant="outline" className="font-normal capitalize">
-                              {apt.department}
-                            </Badge>
+                            <div className="flex flex-col gap-1 items-start">
+                              <Badge variant="outline" className="font-normal capitalize">
+                                {apt.department}
+                              </Badge>
+                              {apt.doctorName && (
+                                <span className="text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">
+                                  {apt.doctorName}
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="px-4 py-3 text-xs text-muted-foreground">
                             <div className="flex items-center gap-1.5 font-medium text-foreground">
@@ -499,6 +508,12 @@ export default function AppointmentsPage() {
                       <span className="text-muted-foreground">Medical Department:</span>
                       <span className="font-medium capitalize">{selectedAppointment.department}</span>
                     </div>
+                    {selectedAppointment.doctorName && (
+                      <div className="flex justify-between border-t border-border/40 pt-1.5">
+                        <span className="text-muted-foreground">Assigned Doctor:</span>
+                        <span className="font-semibold text-blue-700">{selectedAppointment.doctorName}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 

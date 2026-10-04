@@ -1,6 +1,12 @@
-import "dotenv/config";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import dotenv from "dotenv";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "@prisma/client";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config();
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is required. Configure backend/.env first.");
@@ -17,9 +23,10 @@ const adapter = new PrismaMariaDb({
   user: decodeURIComponent(url.username),
   password: decodeURIComponent(url.password),
   database: decodeURIComponent(url.pathname.slice(1)),
-  connectionLimit: 5,
-  connectTimeout: 5000,
-  acquireTimeout: 5000,
+  allowPublicKeyRetrieval: true,
+  connectionLimit: 10,
+  connectTimeout: 10000,
+  acquireTimeout: 10000,
 });
 
 export const prisma = new PrismaClient({ adapter });

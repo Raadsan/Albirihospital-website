@@ -7,7 +7,9 @@ import { CoreValues } from "@/components/About/CoreValues"
 import { WhyChoose } from "@/components/About/Why Choose"
 import { Watch } from "@/components/Home/Watch"
 import { SpecialistDoctors } from "@/components/Home/Specialist Doctors"
+import { DoctorsDirectory } from "@/components/Doctors/DoctorsDirectory"
 import { LeadershipTeam } from "@/components/About/LeadershipTeam"
+import { HospitalOverview } from "@/components/About/HospitalOverview"
 
 const pages = {
   us: {
@@ -55,9 +57,11 @@ export default async function AboutDetailPage({
           <Watch />
         </>
       ) : slug === "doctors" ? (
-        <SpecialistDoctors />
+        <DoctorsDirectory />
       ) : slug === "leadership" ? (
         <LeadershipTeam />
+      ) : slug === "overview" ? (
+        <HospitalOverview />
       ) : (
         <section className="mx-auto min-h-96 max-w-5xl px-6 py-20">
           <p className="font-semibold uppercase tracking-wider text-emerald-600">About Albirri Hospital</p>

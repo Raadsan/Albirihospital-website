@@ -1,10 +1,22 @@
 "use client"
 
+import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import { motion, useReducedMotion } from "framer-motion"
 import { BriefcaseBusiness, GraduationCap } from "lucide-react"
+import api from "@/app/api/api"
 
-const leaders = [
+interface LeaderItem {
+  id?: string
+  name: string
+  role?: string | null
+  title?: string
+  image: string
+  experience?: string | null
+  education?: string | null
+}
+
+const defaultLeaders: LeaderItem[] = [
   {
     name: "Mr. Nur Ahmed Dirie",
     role: "Chief Executive Officer (CEO)",
@@ -41,10 +53,24 @@ const leaders = [
     education:
       "He holds a Bachelor’s degree in Business Administration and a Diploma in Information Technology. His expertise is further strengthened by professional seminars in customer service, team management, and organizational development.",
   },
-] as const
+]
 
 export function LeadershipTeam() {
   const prefersReducedMotion = useReducedMotion()
+  const [leaders, setLeaders] = useState<LeaderItem[]>(defaultLeaders)
+
+  useEffect(() => {
+    api.get("/leadership?available=true")
+      .then((res) => {
+        const data = res.data?.data
+        if (Array.isArray(data) && data.length > 0) {
+          setLeaders(data)
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not load dynamic leadership roster:", err)
+      })
+  }, [])
 
   return (
     <section className="relative overflow-hidden bg-white px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
@@ -80,7 +106,7 @@ export function LeadershipTeam() {
         <div className="space-y-10 lg:space-y-14">
           {leaders.map((leader, index) => (
             <motion.article
-              key={leader.name}
+              key={leader.id || leader.name}
               initial={
                 prefersReducedMotion
                   ? false
@@ -107,7 +133,7 @@ export function LeadershipTeam() {
                 <div className="absolute inset-0 bg-gradient-to-b from-white/25 to-slate-900/10" />
                 <Image
                   src={leader.image}
-                  alt={`${leader.name}, ${leader.role} at Albirri Hospital`}
+                  alt={`${leader.name}, ${leader.role || leader.title} at Albirri Hospital`}
                   fill
                   sizes="(min-width: 1024px) 40vw, 100vw"
                   className="z-10 object-contain object-bottom transition-transform duration-700 ease-out group-hover:scale-[1.02]"
@@ -121,22 +147,27 @@ export function LeadershipTeam() {
                   {leader.name}
                 </h3>
                 <p className="mt-2 text-base font-bold text-[#1E40AF]">
-                  {leader.role} <span className="font-medium text-slate-400">| Albirri Hospital</span>
+                  {leader.role || leader.title}{" "}
+                  <span className="font-medium text-slate-400">| Albirri Hospital</span>
                 </p>
 
                 <div className="mt-7 space-y-6">
-                  <div className="flex gap-4">
-                    <span className="mt-1 flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1E40AF]">
-                      <BriefcaseBusiness aria-hidden="true" className="size-5" />
-                    </span>
-                    <p className="leading-7 text-slate-600">{leader.experience}</p>
-                  </div>
-                  <div className="flex gap-4">
-                    <span className="mt-1 flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                      <GraduationCap aria-hidden="true" className="size-5" />
-                    </span>
-                    <p className="leading-7 text-slate-600">{leader.education}</p>
-                  </div>
+                  {leader.experience && (
+                    <div className="flex gap-4">
+                      <span className="mt-1 flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-[#1E40AF]">
+                        <BriefcaseBusiness aria-hidden="true" className="size-5" />
+                      </span>
+                      <p className="leading-7 text-slate-600">{leader.experience}</p>
+                    </div>
+                  )}
+                  {leader.education && (
+                    <div className="flex gap-4">
+                      <span className="mt-1 flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                        <GraduationCap aria-hidden="true" className="size-5" />
+                      </span>
+                      <p className="leading-7 text-slate-600">{leader.education}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.article>
@@ -146,3 +177,5 @@ export function LeadershipTeam() {
     </section>
   )
 }
+
+export default LeadershipTeam

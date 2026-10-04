@@ -16,6 +16,7 @@ import api from "@/app/api/api"
 export function SectionCards() {
   const [stats, setStats] = React.useState({
     appointments: 0,
+    inquiries: 0,
     doctors: 0,
     blogs: 0,
     videos: 0,
@@ -25,10 +26,11 @@ export function SectionCards() {
   React.useEffect(() => {
     Promise.allSettled([
       api.get("/appointments"),
+      api.get("/contact"),
       api.get("/doctors"),
       api.get("/blogs"),
       api.get("/videos"),
-    ]).then(([apptRes, docRes, blogRes, vidRes]) => {
+    ]).then(([apptRes, contactRes, docRes, blogRes, vidRes]) => {
       const getCount = (res: PromiseSettledResult<{ data?: { count?: number; data?: unknown[] } | unknown[] }>) => {
         if (res.status === "fulfilled" && res.value?.data) {
           const d = res.value.data
@@ -41,6 +43,7 @@ export function SectionCards() {
 
       setStats({
         appointments: getCount(apptRes),
+        inquiries: getCount(contactRes),
         doctors: getCount(docRes),
         blogs: getCount(blogRes),
         videos: getCount(vidRes),
