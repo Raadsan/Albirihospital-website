@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 
 import { Footer } from "@/components/Footer";
+import { HospitalChatbot } from "@/components/HospitalChatbot";
 import { LanguageProvider } from "@/components/language-provider";
 import { Navbar } from "@/components/Navbar";
 import { Tobbar } from "@/components/Tobbar";
@@ -24,6 +25,7 @@ export default async function SiteLayout({
       </header>
       <main className="flex-1">{children}</main>
       <Footer />
+      <HospitalChatbot />
       <WhatsAppButton />
     </LanguageProvider>
   );

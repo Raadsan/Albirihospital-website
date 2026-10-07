@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { toast } from "react-toastify"
 
 import {
   Avatar,
@@ -37,9 +38,11 @@ export function NavUser({
   const router = useRouter()
 
   function handleLogout() {
+    window.localStorage.removeItem("token")
     window.localStorage.removeItem("albiri_admin_user")
     document.cookie =
       "albiri_demo_admin=; path=/; max-age=0; samesite=lax"
+    toast.success("You have been logged out successfully.")
     router.replace("/admin/login")
     router.refresh()
   }

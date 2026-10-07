@@ -15,7 +15,7 @@ import {
   EyeIcon,
   AlertCircleIcon,
 } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "react-toastify"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"

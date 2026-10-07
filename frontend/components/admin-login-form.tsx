@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LockKeyholeIcon, Loader2Icon } from "lucide-react";
+import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -45,6 +46,7 @@ export function AdminLoginForm() {
         document.cookie =
           "albiri_demo_admin=1; path=/; max-age=604800; samesite=lax";
 
+        toast.success("Welcome back! Opening the admin dashboard.");
         router.replace("/admin/dashboard");
         router.refresh();
         return;
@@ -70,6 +72,7 @@ export function AdminLoginForm() {
         document.cookie =
           "albiri_demo_admin=1; path=/; max-age=604800; samesite=lax";
 
+        toast.success("Welcome back! Opening the admin dashboard.");
         router.replace("/admin/dashboard");
         router.refresh();
         return;
@@ -80,6 +83,7 @@ export function AdminLoginForm() {
         "Invalid email or password. Please check your credentials."
       );
       setError(apiError);
+      toast.error(apiError);
       setLoading(false);
       return;
     }

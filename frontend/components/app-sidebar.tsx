@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
@@ -20,7 +21,6 @@ import {
   UsersIcon,
   FileTextIcon,
   VideoIcon,
-  HeartPulseIcon,
   MailIcon,
   AwardIcon,
 } from "lucide-react"
@@ -69,20 +69,28 @@ const data = {
     },
   ],
 }
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="border-b border-sidebar-border/40 py-2.5">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              size="lg"
+              className="h-auto py-1 px-1.5 hover:bg-transparent data-[slot=sidebar-menu-button]:p-1!"
               render={<Link href="/admin/dashboard" />}
             >
-              <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <HeartPulseIcon className="size-4!" />
-              </span>
-              <span className="text-base font-semibold">Albiri Hospital</span>
+              <div className="flex items-center">
+                <Image
+                  src="/images/LOGO2-01.png"
+                  alt="Albiri Hospital"
+                  width={200}
+                  height={50}
+                  className="h-18 w-auto object-contain"
+                  priority
+                />
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

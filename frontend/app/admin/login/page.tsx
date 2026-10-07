@@ -29,11 +29,10 @@ export default function AdminLoginPage() {
             <ShieldCheckIcon className="size-7 text-[#C3F0DB]" />
           </div>
           <h1 className="text-4xl font-semibold tracking-tight xl:text-5xl">
-            Maamulka isbitaalka oo hal meel ah.
+            Hospital management in one place.
           </h1>
           <p className="text-base leading-7 text-blue-100">
-            Si ammaan ah u maamul xogta, adeegyada, iyo hawlaha maalinlaha
-            ah ee Albiri Hospital.
+            Securely manage patient records, healthcare services, and daily operations of Albiri Hospital.
           </p>
         </div>
 

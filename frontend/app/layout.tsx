@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Poppins, Geist_Mono } from "next/font/google";
+import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ToastNotifications } from "@/components/toast-notifications";
 
 const poppins = Poppins({
   weight: ["300", "400", "500", "600", "700"],
@@ -36,6 +38,7 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <TooltipProvider>{children}</TooltipProvider>
+        <ToastNotifications />
       </body>
     </html>
   );

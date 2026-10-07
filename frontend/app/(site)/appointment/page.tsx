@@ -165,12 +165,9 @@ function AppointmentFormContent() {
                     <CheckCircle2 className="w-12 h-12" />
                   </div>
                   <h4 className="text-xl font-bold text-slate-900">Booking Request Sent!</h4>
-                  {confirmedId && (
-                    <div className="mt-2 rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800 border border-emerald-200">
-                      Reference ID: <span className="font-mono">{confirmedId}</span>
-                    </div>
-                  )}
-                  <p className="mt-2 text-slate-600 max-w-sm">We have received your details. One of our hospital desk coordinators will contact you shortly to confirm the consultation slot.</p>
+                  <p className="mt-3 text-slate-600 max-w-sm">
+                    We have received your details. One of our hospital desk coordinators will contact you shortly to confirm your consultation slot.
+                  </p>
                   <button
                     onClick={() => {
                       setIsSubmitted(false);

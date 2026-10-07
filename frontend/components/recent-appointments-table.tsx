@@ -21,7 +21,7 @@ import {
   CheckIcon,
   BanIcon,
 } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "react-toastify"
 
 import api from "@/app/api/api"
 import { getApiErrorMessage } from "@/lib/api-error"
@@ -46,6 +46,7 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -450,48 +451,52 @@ export function RecentAppointmentsTable() {
                         <span className="sr-only">Open menu</span>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setSelectedAppointment(apt)
-                            setIsSheetOpen(true)
-                          }}
-                          className="gap-2 cursor-pointer"
-                        >
-                          <EyeIcon className="size-4 text-blue-600" />
-                          View Full Details
-                        </DropdownMenuItem>
+                        <DropdownMenuGroup>
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedAppointment(apt)
+                              setIsSheetOpen(true)
+                            }}
+                            className="gap-2 cursor-pointer"
+                          >
+                            <EyeIcon className="size-4 text-blue-600" />
+                            View Full Details
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuLabel className="text-[11px] text-muted-foreground font-normal">
-                          Change Status
-                        </DropdownMenuLabel>
-                        {apt.status !== "CONFIRMED" && (
-                          <DropdownMenuItem
-                            onClick={() => handleUpdateStatus(apt.id, "CONFIRMED")}
-                            className="gap-2 cursor-pointer text-blue-700 font-medium"
-                          >
-                            <CheckIcon className="size-4" />
-                            Mark as Confirmed
-                          </DropdownMenuItem>
-                        )}
-                        {apt.status !== "COMPLETED" && (
-                          <DropdownMenuItem
-                            onClick={() => handleUpdateStatus(apt.id, "COMPLETED")}
-                            className="gap-2 cursor-pointer text-emerald-700 font-medium"
-                          >
-                            <CheckCircle2Icon className="size-4" />
-                            Mark as Completed
-                          </DropdownMenuItem>
-                        )}
-                        {apt.status !== "CANCELLED" && (
-                          <DropdownMenuItem
-                            onClick={() => handleUpdateStatus(apt.id, "CANCELLED")}
-                            className="gap-2 cursor-pointer text-rose-700"
-                          >
-                            <BanIcon className="size-4" />
-                            Mark as Cancelled
-                          </DropdownMenuItem>
-                        )}
+                        <DropdownMenuGroup>
+                          <DropdownMenuLabel className="text-[11px] text-muted-foreground font-normal">
+                            Change Status
+                          </DropdownMenuLabel>
+                          {apt.status !== "CONFIRMED" && (
+                            <DropdownMenuItem
+                              onClick={() => handleUpdateStatus(apt.id, "CONFIRMED")}
+                              className="gap-2 cursor-pointer text-blue-700 font-medium"
+                            >
+                              <CheckIcon className="size-4" />
+                              Mark as Confirmed
+                            </DropdownMenuItem>
+                          )}
+                          {apt.status !== "COMPLETED" && (
+                            <DropdownMenuItem
+                              onClick={() => handleUpdateStatus(apt.id, "COMPLETED")}
+                              className="gap-2 cursor-pointer text-emerald-700 font-medium"
+                            >
+                              <CheckCircle2Icon className="size-4" />
+                              Mark as Completed
+                            </DropdownMenuItem>
+                          )}
+                          {apt.status !== "CANCELLED" && (
+                            <DropdownMenuItem
+                              onClick={() => handleUpdateStatus(apt.id, "CANCELLED")}
+                              className="gap-2 cursor-pointer text-rose-700"
+                            >
+                              <BanIcon className="size-4" />
+                              Mark as Cancelled
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuGroup>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
