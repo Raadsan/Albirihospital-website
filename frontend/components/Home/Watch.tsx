@@ -73,7 +73,7 @@ export function Watch() {
     const { t } = useLanguage()
 
     useEffect(() => {
-        api.get("/videos")
+        api.get("/videos?department=general")
             .then((res) => {
                 const list = res.data?.data || (Array.isArray(res.data) ? res.data : [])
                 setVideos(list)

@@ -72,6 +72,7 @@ model Video {
   doctor      String   @default("Al-Birri Medical Team")
   youtubeUrl  String   @db.Text
   category    String   @default("Watch & Learn")
+  department  String   @default("general")
   description String?  @db.Text
   published   Boolean  @default(true)
   createdAt   DateTime @default(now())

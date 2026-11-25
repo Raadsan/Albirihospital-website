@@ -276,11 +276,15 @@ export default function AppointmentsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ALL">All Departments</SelectItem>
-                    <SelectItem value="Cardiology">Cardiology</SelectItem>
-                    <SelectItem value="Pediatrics">Pediatrics</SelectItem>
-                    <SelectItem value="General Medicine">General Medicine</SelectItem>
-                    <SelectItem value="Dental Care">Dental Care</SelectItem>
-                    <SelectItem value="Emergency">Emergency</SelectItem>
+                    <SelectItem value="general">General</SelectItem>
+                    <SelectItem value="inpatient">Inpatient</SelectItem>
+                    <SelectItem value="outpatient">Outpatient</SelectItem>
+                    <SelectItem value="theatre">Theatre (OT)</SelectItem>
+                    <SelectItem value="specialties">Specialties</SelectItem>
+                    <SelectItem value="maternity">Maternity</SelectItem>
+                    <SelectItem value="pharmacy">Pharmacy</SelectItem>
+                    <SelectItem value="laboratory">Laboratory</SelectItem>
+                    <SelectItem value="radiology">Radiology</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

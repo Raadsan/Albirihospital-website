@@ -7,7 +7,7 @@ import { prisma } from "../db.js";
  */
 export async function getVideos(req, res) {
   try {
-    const { category, search, all } = req.query;
+    const { category, department, search, all } = req.query;
 
     const where = {};
 
@@ -20,10 +20,15 @@ export async function getVideos(req, res) {
       where.category = { contains: category };
     }
 
+    if (department) {
+      where.department = department.trim().toLowerCase();
+    }
+
     if (search) {
       where.OR = [
         { title: { contains: search } },
         { doctor: { contains: search } },
+        { department: { contains: search } },
         { description: { contains: search } },
       ];
     }
@@ -92,6 +97,7 @@ export async function createVideo(req, res) {
       doctor = "Al-Birri Medical Team",
       youtubeUrl,
       category = "Watch & Learn",
+      department = "general",
       description,
       published = true,
     } = req.body;
@@ -109,6 +115,7 @@ export async function createVideo(req, res) {
         doctor: doctor.trim(),
         youtubeUrl: youtubeUrl.trim(),
         category: category.trim(),
+        department: department.trim().toLowerCase(),
         description: description ? description.trim() : null,
         published: Boolean(published),
       },
@@ -150,6 +157,7 @@ export async function updateVideo(req, res) {
     if (updateData.doctor) updateData.doctor = updateData.doctor.trim();
     if (updateData.youtubeUrl) updateData.youtubeUrl = updateData.youtubeUrl.trim();
     if (updateData.category) updateData.category = updateData.category.trim();
+    if (updateData.department) updateData.department = updateData.department.trim().toLowerCase();
 
     const updated = await prisma.video.update({
       where: { id },

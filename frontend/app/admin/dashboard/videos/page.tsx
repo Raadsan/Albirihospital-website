@@ -55,6 +55,7 @@ export interface VideoItem {
   doctor: string
   youtubeUrl: string
   category: string
+  department: string
   description?: string | null
   published: boolean
   createdAt: string
@@ -64,16 +65,32 @@ const emptyVideoForm = {
   title: "",
   doctor: "Al-Birri Medical Team",
   youtubeUrl: "",
-  category: "General Health",
+  category: "Patient Testimonial",
+  department: "general",
   description: "",
   published: true,
 }
+
+const departmentOptions = [
+  { value: "general", label: "General / Homepage" },
+  { value: "inpatient", label: "Inpatient" },
+  { value: "outpatient", label: "Outpatient" },
+  { value: "theatre", label: "Theatre (OT)" },
+  { value: "specialties", label: "Specialties" },
+  { value: "maternity", label: "Maternity" },
+  { value: "pharmacy", label: "Pharmacy" },
+  { value: "laboratory", label: "Laboratory" },
+  { value: "radiology", label: "Radiology" },
+] as const
+
+const getDepartmentLabel = (department: string) =>
+  departmentOptions.find((option) => option.value === department)?.label || department
 
 export default function VideosPage() {
   const [videos, setVideos] = React.useState<VideoItem[]>([])
   const [loading, setLoading] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
-  const [categoryFilter, setCategoryFilter] = React.useState("ALL")
+  const [departmentFilter, setDepartmentFilter] = React.useState("ALL")
   const [isSheetOpen, setIsSheetOpen] = React.useState(false)
   const [editingVideo, setEditingVideo] = React.useState<VideoItem | null>(null)
   const [uploadingVideo, setUploadingVideo] = React.useState(false)
@@ -118,6 +135,7 @@ export default function VideosPage() {
       doctor: video.doctor,
       youtubeUrl: video.youtubeUrl,
       category: video.category,
+      department: video.department || "general",
       description: video.description || "",
       published: video.published,
     })
@@ -203,10 +221,11 @@ export default function VideosPage() {
     const matchesSearch =
       vid.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       vid.doctor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vid.category.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCat =
-      categoryFilter === "ALL" || vid.category.toLowerCase() === categoryFilter.toLowerCase()
-    return matchesSearch && matchesCat
+      vid.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (vid.department || "general").toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesDepartment =
+      departmentFilter === "ALL" || (vid.department || "general") === departmentFilter
+    return matchesSearch && matchesDepartment
   })
 
   return (
@@ -227,10 +246,10 @@ export default function VideosPage() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                  Health Awareness Videos
+                  Department Testimonial Videos
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Al-Birri Hospital: Manage medical educational and health awareness video gallery.
+                  Add patient stories and choose exactly which department page should display each video.
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -262,10 +281,10 @@ export default function VideosPage() {
                         <span className="flex size-8 items-center justify-center rounded-lg bg-secondary text-secondary-foreground">
                           <VideoIcon className="size-4" />
                         </span>
-                        {editingVideo ? "Edit Educational Health Video" : "Add Educational Health Video"}
+                        {editingVideo ? "Edit Department Video" : "Add Department Video"}
                       </SheetTitle>
                       <SheetDescription className="text-sm text-muted-foreground mt-1">
-                        Upload a video file or add a YouTube link for the Watch & Learn section.
+                        Upload a video or add a YouTube link, then assign it to a department page.
                       </SheetDescription>
                     </SheetHeader>
 
@@ -315,11 +334,11 @@ export default function VideosPage() {
                         </div>
                       </div>
 
-                      {/* Row 2: Speaker & Category */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      {/* Row 2: Speaker, Department & Category */}
+                      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                         <div className="space-y-2">
                           <Label htmlFor="doctor" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            Speaker / Specialist Doctor
+                            Patient / Speaker Name
                           </Label>
                           <Input
                             id="doctor"
@@ -331,17 +350,37 @@ export default function VideosPage() {
                         </div>
 
                         <div className="space-y-2">
+                          <Label htmlFor="department" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            Department Page <span className="text-rose-500">*</span>
+                          </Label>
+                          <Select
+                            value={formData.department}
+                            onValueChange={(val) => setFormData({ ...formData, department: val ?? "general" })}
+                          >
+                            <SelectTrigger id="department" className="h-11 rounded-xl border-border/80 px-3.5 text-sm">
+                              <SelectValue placeholder="Select Department" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {departmentOptions.map((option) => (
+                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-2 sm:col-span-2">
                           <Label htmlFor="category" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                             Video Category
                           </Label>
                           <Select
                             value={formData.category}
-                            onValueChange={(val) => setFormData({ ...formData, category: val ?? "Cardiology" })}
+                            onValueChange={(val) => setFormData({ ...formData, category: val ?? "Patient Testimonial" })}
                           >
                             <SelectTrigger id="category" className="h-11 rounded-xl border-border/80 px-3.5 text-sm">
                               <SelectValue placeholder="Select Category" />
                             </SelectTrigger>
                             <SelectContent>
+                              <SelectItem value="Patient Testimonial">Patient Testimonial</SelectItem>
                               <SelectItem value="Cardiology">Cardiology</SelectItem>
                               <SelectItem value="Pediatrics">Pediatrics</SelectItem>
                               <SelectItem value="Dental Care">Dental Care</SelectItem>
@@ -394,23 +433,22 @@ export default function VideosPage() {
               <div className="relative flex-1">
                 <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search video title, doctor, or category..."
+                  placeholder="Search title, speaker, category, or department..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 h-10"
                 />
               </div>
               <div className="flex items-center gap-2">
-                <Select value={categoryFilter} onValueChange={(val) => setCategoryFilter(val ?? "ALL")}>
+                <Select value={departmentFilter} onValueChange={(val) => setDepartmentFilter(val ?? "ALL")}>
                   <SelectTrigger className="w-[180px] h-10">
-                    <SelectValue placeholder="Category" />
+                    <SelectValue placeholder="Department" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ALL">All Categories</SelectItem>
-                    <SelectItem value="Cardiology">Cardiology</SelectItem>
-                    <SelectItem value="Pediatrics">Pediatrics</SelectItem>
-                    <SelectItem value="Dental Care">Dental Care</SelectItem>
-                    <SelectItem value="General Health">General Health</SelectItem>
+                    <SelectItem value="ALL">All Departments</SelectItem>
+                    {departmentOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -431,7 +469,7 @@ export default function VideosPage() {
                         <PlayCircleIcon className="size-12 text-white/90 drop-shadow-md group-hover:scale-110 transition-transform" />
                       </div>
                       <Badge className="absolute top-2 left-2 bg-black/60 backdrop-blur-xs text-white border-0 text-[11px]">
-                        {vid.category}
+                        {getDepartmentLabel(vid.department || "general")}
                       </Badge>
                     </div>
 
