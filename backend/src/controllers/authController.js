@@ -1,183 +1,133 @@
 import { prisma } from "../db.js";
 import { hashPassword, comparePassword, generateToken } from "../utils/jwt.js";
 
-/**
- * @desc    Register a new user (Admin/Doctor/Staff)
- * @route   POST /api/auth/register
- * @access  Public
- */
+const MIN_PASSWORD_LENGTH = 12;
+const MAX_PASSWORD_BYTES = 72;
+const passwordRequirements = "Use at least 12 characters and no more than 72 bytes.";
+const roles = ["ADMIN", "RECEPTIONIST"];
+
+function validNewPassword(password) {
+  return typeof password === "string" &&
+    Array.from(password.trim()).length >= MIN_PASSWORD_LENGTH &&
+    Buffer.byteLength(password, "utf8") <= MAX_PASSWORD_BYTES;
+}
+
+const invalidCredentials = {
+  success: false,
+  error: "Invalid email or password.",
+};
+
+// An authorized admin provisions staff accounts.
 export async function register(req, res) {
+  const { name, email, password, role = "RECEPTIONIST" } = req.body ?? {};
+  const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+  const normalizedName = typeof name === "string" ? name.trim() : "";
+  const requestedRole = typeof role === "string" ? role.trim().toUpperCase() : "";
+
+  if (!normalizedName || normalizedName.length > 191 ||
+      !/^[^\s@]+@[^\s@]+$/.test(normalizedEmail) || normalizedEmail.length > 191) {
+    return res.status(400).json({ success: false, error: "Enter a valid name and email address." });
+  }
+
+  if (!validNewPassword(password)) {
+    return res.status(400).json({ success: false, error: passwordRequirements });
+  }
+
+  if (!roles.includes(requestedRole)) {
+    return res.status(400).json({ success: false, error: "Choose an Admin or Receptionist role." });
+  }
+
   try {
-    const { name, email, password, role } = req.body;
-
-    // Validation
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        error: "Name, email, and password are required.",
-      });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({
-        success: false,
-        error: "Password must be at least 6 characters long.",
-      });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email: normalizedEmail },
-    });
-
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        error: "This email address is already registered.",
-      });
-    }
-
-    // Hash password
-    const hashedPassword = await hashPassword(password);
-
-    // Allowed roles in Albiri Hospital system: ADMIN or RECEPTIONIST
-    const validRoles = ["ADMIN", "RECEPTIONIST"];
-    const requestedRole = role ? role.toUpperCase().trim() : "RECEPTIONIST";
-
-    if (role && !validRoles.includes(requestedRole)) {
-      return res.status(400).json({
-        success: false,
-        error: "User role must be either ADMIN or RECEPTIONIST.",
-      });
-    }
-
-    const userRole = requestedRole;
-
-    // Create user in MySQL
     const user = await prisma.user.create({
       data: {
-        name: name.trim(),
+        name: normalizedName,
         email: normalizedEmail,
-        password: hashedPassword,
-        role: userRole,
+        password: await hashPassword(password),
+        role: requestedRole,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
+      select: { id: true, name: true, email: true, role: true, createdAt: true },
     });
 
-    // Generate JWT Token
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
-    return res.status(201).json({
-      success: true,
-      message: "User registered successfully.",
-      token,
-      user,
-    });
+    return res.status(201).json({ success: true, user });
   } catch (error) {
-    console.error("Register Error:", error);
-    return res.status(500).json({
-      success: false,
-      error: "An internal server error occurred during registration. Please try again.",
-    });
+    if (error.code === "P2002") {
+      return res.status(409).json({ success: false, error: "This email address is already registered." });
+    }
+    return res.status(500).json({ success: false, error: "The account could not be created." });
   }
 }
 
-/**
- * @desc    Login user & get token
- * @route   POST /api/auth/login
- * @access  Public
- */
 export async function login(req, res) {
+  res.set("Cache-Control", "no-store");
+  const { email, password } = req.body ?? {};
+  const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+
+  if (!normalizedEmail || normalizedEmail.length > 191 ||
+      typeof password !== "string" || !password || password.length > 1024) {
+    return res.status(400).json({ success: false, error: "Enter your email address and password." });
+  }
+
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        error: "Email and password are required.",
-      });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-
-    // Find user by email
     const user = await prisma.user.findUnique({
       where: { email: normalizedEmail },
+      select: { id: true, name: true, email: true, role: true, password: true, createdAt: true },
     });
 
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        error: "Invalid email or password.",
-      });
+    if (!user || !(await comparePassword(password, user.password))) {
+      return res.status(401).json(invalidCredentials);
     }
 
-    // Verify password
-    const isMatch = await comparePassword(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        error: "Invalid email or password.",
-      });
-    }
-
-    // Generate JWT Token
-    const token = generateToken({
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
+    const { password: _password, ...profile } = user;
     return res.status(200).json({
       success: true,
-      message: "Login successful.",
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        createdAt: user.createdAt,
-      },
+      token: generateToken(user),
+      user: profile,
     });
-  } catch (error) {
-    console.error("Login Error:", error);
-    return res.status(500).json({
-      success: false,
-      error: "Server error during login. Please try again later.",
-    });
+  } catch {
+    return res.status(500).json({ success: false, error: "Sign-in is temporarily unavailable." });
   }
 }
 
-/**
- * @desc    Get currently logged in user profile
- * @route   GET /api/auth/me
- * @access  Private (Protected by JWT)
- */
-export async function getMe(req, res) {
+export function getMe(req, res) {
+  return res.json({ success: true, user: req.user });
+}
+
+export async function changePassword(req, res) {
+  const { currentPassword, newPassword } = req.body ?? {};
+
+  if (typeof currentPassword !== "string" || !currentPassword || currentPassword.length > 1024) {
+    return res.status(400).json({ success: false, error: "Enter your current password." });
+  }
+
+  if (!validNewPassword(newPassword)) {
+    return res.status(400).json({ success: false, error: passwordRequirements });
+  }
+
   try {
-    // req.user was already set by protect middleware
-    return res.status(200).json({
-      success: true,
-      user: req.user,
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { password: true },
     });
-  } catch (error) {
-    console.error("GetMe Error:", error);
-    return res.status(500).json({
-      success: false,
-      error: "Server error retrieving profile.",
+
+    if (!user || !(await comparePassword(currentPassword, user.password))) {
+      return res.status(400).json({ success: false, error: "The current password is incorrect." });
+    }
+
+    if (await comparePassword(newPassword, user.password)) {
+      return res.status(400).json({ success: false, error: "Choose a password different from your current one." });
+    }
+
+    const result = await prisma.user.updateMany({
+      where: { id: req.user.id, password: user.password },
+      data: { password: await hashPassword(newPassword) },
     });
+
+    if (result.count !== 1) {
+      return res.status(409).json({ success: false, error: "The password changed. Sign in and try again." });
+    }
+
+    return res.json({ success: true, message: "Password updated. Sign in with your new password." });
+  } catch {
+    return res.status(500).json({ success: false, error: "The password could not be changed. Try again later." });
   }
 }

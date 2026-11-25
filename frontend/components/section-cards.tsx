@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { CalendarDays, Stethoscope, Newspaper, Video } from "lucide-react"
-import api from "@/app/api/api"
+import { adminApi as api } from "@/app/api/api"
 
 export function SectionCards() {
   const [stats, setStats] = React.useState({

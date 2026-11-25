@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ArrowDown, ArrowRight, ArrowUpRight, Building2, CalendarDays, CheckCircle2, MapPin, MessageCircle, Phone, Plus } from "lucide-react"
+import { ArrowDown, ArrowUpRight, Building2, CalendarDays, CheckCircle2, MapPin, MessageCircle, Phone, Plus } from "lucide-react"
 import { DepartmentAppointmentHero } from "@/components/Departments/DepartmentAppointmentHero"
 import { DepartmentDoctors } from "@/components/Departments/DepartmentDoctors"
 import { DepartmentTestimonials } from "@/components/Departments/DepartmentTestimonials"
@@ -25,7 +25,9 @@ const sectionLinks = [
   { id: "overview", label: "Overview" },
   { id: "why-choose", label: "Why Choose Al-Birri" },
   { id: "locations", label: "Locations" },
-  { id: "services", label: "Services & facilities" },
+  { id: "services", label: "Services" },
+  { id: "care-needs", label: "Care needs" },
+  { id: "facilities", label: "Facilities" },
   { id: "questions", label: "FAQs" },
 ]
 
@@ -150,29 +152,49 @@ export default async function DepartmentDetailPage({
       </section>
 
       <section id="services" aria-labelledby="services-title" className="scroll-mt-28 bg-white">
-        <div className={`${container} grid items-start gap-8 py-12 sm:py-16 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:gap-14`}>
-          <div>
-            <h2 id="services-title" className={sectionHeading}>Services and procedures</h2>
-            <div className="mt-5 divide-y divide-slate-200">
-              {page.services.map(({ title, description }) => (
-                <div key={title} className="py-4 first:pt-2 last:pb-0">
-                  <h3 className="text-base font-bold text-slate-900 sm:text-lg">{title}</h3>
-                  <p className="mt-1.5 text-sm leading-6 text-slate-600 sm:text-base sm:leading-7">{description}</p>
-                </div>
-              ))}
-            </div>
+        <div className={`${container} py-12 sm:py-16`}>
+          <h2 id="services-title" className={sectionHeading}>{page.services.title}</h2>
+          <p className="mt-3 max-w-4xl text-base leading-7 text-slate-700">{page.services.introduction}</p>
+          <ul className="mt-7 grid gap-5 md:grid-cols-2 md:gap-x-10">
+            {page.services.items.map(({ title, description }) => (
+              <li key={title} className="border-l-2 border-emerald-600 pl-4 sm:pl-5">
+                <h3 className="text-lg font-bold leading-snug text-[#0b245f]">{title}</h3>
+                <p className="mt-1.5 text-base leading-7 text-slate-700">{description}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section id="care-needs" aria-labelledby="care-needs-title" className="scroll-mt-28 bg-white">
+        <div className={`${container} border-t border-slate-200 py-12 sm:py-16`}>
+          <h2 id="care-needs-title" className={sectionHeading}>{page.careNeeds.title}</h2>
+          <p className="mt-3 max-w-4xl text-base leading-7 text-slate-700">{page.careNeeds.introduction}</p>
+          <div className="mt-7 grid gap-4 md:grid-cols-2 md:gap-6">
+            {page.careNeeds.groups.map(({ title, items }) => (
+              <div key={title} className="rounded-2xl bg-[#edf4ff] p-5 sm:p-6">
+                <h3 className="font-bold text-[#0b245f]">{title}</h3>
+                <ul className="mt-3 list-disc space-y-2 pl-5 text-base leading-7 text-slate-700 marker:text-emerald-700">
+                  {items.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              </div>
+            ))}
           </div>
-          <aside aria-labelledby="facilities-title" className="rounded-2xl bg-[#edf4ff] p-6 sm:p-8">
-            <h3 id="facilities-title" className="text-xl font-bold tracking-tight text-[#0b245f]">Facilities and support</h3>
-            <ul className="mt-5 space-y-4">
-              {page.facilities.map((facility) => (
-                <li key={facility} className="flex items-start gap-3 text-sm leading-6 text-slate-800 sm:text-base">
-                  <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-700" aria-hidden="true" />
-                  {facility}
-                </li>
-              ))}
-            </ul>
-          </aside>
+        </div>
+      </section>
+
+      <section id="facilities" aria-labelledby="facilities-title" className="scroll-mt-28 border-y border-slate-200 bg-slate-50">
+        <div className={`${container} py-12 sm:py-16`}>
+          <h2 id="facilities-title" className={sectionHeading}>{page.facilities.title}</h2>
+          <p className="mt-3 max-w-4xl text-base leading-7 text-slate-700">{page.facilities.introduction}</p>
+          <ul className="mt-7 grid gap-3 md:grid-cols-2 md:gap-x-6">
+            {page.facilities.items.map((facility) => (
+              <li key={facility} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-base leading-6 text-slate-800">
+                <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-emerald-700" aria-hidden="true" />
+                {facility}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -214,21 +236,6 @@ export default async function DepartmentDetailPage({
           </div>
         </div>
       </section>
-
-      <nav aria-labelledby="other-departments-title" className="border-t border-slate-200 bg-slate-50">
-        <div className={`${container} py-8 sm:py-10`}>
-          <h2 id="other-departments-title" className="text-lg font-bold text-[#0b245f]">Explore other departments</h2>
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {Object.entries(departments).filter(([key]) => key !== slug).map(([key, department]) => (
-              <li key={key}>
-                <Link href={`/departments/${key}`} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-[#2449aa] hover:border-blue-300 hover:bg-blue-50">
-                  {department.breadcrumb} <ArrowRight className="size-3.5" aria-hidden="true" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </nav>
     </>
   )
 }

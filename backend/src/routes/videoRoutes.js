@@ -6,12 +6,12 @@ import {
   updateVideo,
   deleteVideo,
 } from "../controllers/videoController.js";
-import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
+import { protect, authorizeRoles, requireAdminForDrafts } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
 // Public routes (Website visitors can see health videos)
-router.get("/", getVideos);
+router.get("/", requireAdminForDrafts, getVideos);
 router.get("/:id", getVideoById);
 
 // Admin only routes (Only ADMIN can add, update, or remove videos)

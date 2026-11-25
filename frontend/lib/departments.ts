@@ -8,8 +8,21 @@ type DepartmentContent = {
     introduction: string
     reasons: { title: string; description: string }[]
   }
-  services: { title: string; description: string }[]
-  facilities: string[]
+  services: {
+    title: string
+    introduction: string
+    items: { title: string; description: string }[]
+  }
+  careNeeds: {
+    title: string
+    introduction: string
+    groups: { title: string; items: string[] }[]
+  }
+  facilities: {
+    title: string
+    introduction: string
+    items: string[]
+  }
   locations: { campus: "km14" | "adado"; description: string }[]
   doctorDepartments: string[]
   questions: { question: string; answer: string }[]
@@ -38,12 +51,29 @@ export const departments = {
         { title: "Two hospital locations", description: "Inpatient services are available at KM14 in Mogadishu and at the Adado branch. Reception can help confirm where a planned admission will take place." },
       ],
     },
-    services: [
-      { title: "Ward care", description: "Doctors and nurses provide ongoing care and monitoring throughout the hospital stay." },
-      { title: "Recovery after surgery", description: "The ward team supports recovery following operations and coordinates with the surgical team." },
-      { title: "Maternity admissions", description: "The inpatient division includes maternity wards, where mothers can receive care during their hospital stay." },
-    ],
-    facilities: ["Private and shared patient rooms", "Patient monitoring equipment", "Round-the-clock nursing care", "Meals for admitted patients"],
+    services: {
+      title: "Inpatient Care Services",
+      introduction: "During a hospital stay, the ward team carries out the care plan and stays in contact with the departments involved in your treatment or recovery.",
+      items: [
+        { title: "Medical and nursing care", description: "Doctors oversee treatment, and ward nurses provide day-to-day care throughout your stay." },
+        { title: "Observation and monitoring", description: "Staff monitor your condition as directed by your care team and share any changes with the doctors looking after you." },
+        { title: "Post-operative care", description: "The ward and surgical teams coordinate the transfer from theatre and continue care during recovery." },
+        { title: "Maternity ward care", description: "Mothers admitted to the maternity ward receive inpatient care during their stay, with newborn support coordinated by the maternity team." },
+      ],
+    },
+    careNeeds: {
+      title: "Reasons for a Hospital Stay",
+      introduction: "The admitting clinician determines whether you need to stay and which ward is appropriate for your care.",
+      groups: [
+        { title: "Treatment and observation", items: ["Treatment that requires a hospital admission", "Continued observation after assessment", "Ongoing monitoring under the care of a ward team"] },
+        { title: "Recovery and maternity stays", items: ["Recovery after a planned operation", "Ward care after emergency surgery", "An inpatient stay after delivery"] },
+      ],
+    },
+    facilities: {
+      title: "Inpatient Facilities and Support",
+      introduction: "Al-Birri provides ward care at KM14 and Adado. Reception can confirm room options and admission arrangements for your branch.",
+      items: ["Private rooms and shared wards", "Patient monitoring equipment", "Round-the-clock ward nursing", "Meals for admitted patients", "Maternity wards", "Customer care desk for admissions"],
+    },
     locations: [
       { campus: "km14", description: "90 inpatient beds across private rooms and general wards." },
       { campus: "adado", description: "30 inpatient beds and a maternity ward." },
@@ -77,12 +107,29 @@ export const departments = {
         { title: "Clinics in Mogadishu and Adado", description: "Al-Birri has outpatient clinics at KM14 and Adado. Specialty schedules differ by branch, so you can confirm the location with the appointment desk before travelling." },
       ],
     },
-    services: [
-      { title: "General and specialist visits", description: "Arrange a first consultation or return for follow-up with your care team." },
-      { title: "Heart, ENT, and eye clinics", description: "The outpatient service includes cardiology, ear, nose and throat, and ophthalmology consultations." },
-      { title: "Additional specialist clinics", description: "Ask reception about orthopedics, neurosurgery, dermatology, and nephrology clinic schedules." },
-    ],
-    facilities: ["Consultation rooms", "Same-day diagnostic testing for eligible visits", "Access to laboratory and imaging services", "Outpatient pharmacy"],
+    services: {
+      title: "Outpatient Visits and Diagnostic Services",
+      introduction: "Outpatient appointments cover first assessments, referrals, and follow-up. You can return home after your visit unless your clinician recommends admission.",
+      items: [
+        { title: "General consultations", description: "Discuss a concern with a clinician and review whether you need testing, follow-up, or a referral to a specialist." },
+        { title: "Specialist consultations", description: "The appointment desk can help you find the right clinic, including orthopedics, neurosurgery, dermatology, and nephrology." },
+        { title: "Lab tests and imaging", description: "If your clinician requests a test or scan, the clinic can direct you to the appropriate department and help you check availability." },
+        { title: "Follow-up and results review", description: "Return with any new results or earlier records to review your progress and discuss the next step in your care." },
+      ],
+    },
+    careNeeds: {
+      title: "Common Reasons for an Outpatient Visit",
+      introduction: "Use these examples to identify what kind of appointment you need. The appointment desk can confirm the clinic schedule and location.",
+      groups: [
+        { title: "General appointments", items: ["A first assessment of a health concern", "Review of test results or records", "A planned follow-up visit"] },
+        { title: "Specialist referrals", items: ["Cardiology consultations", "Ear, nose and throat assessments", "Ophthalmology appointments"] },
+      ],
+    },
+    facilities: {
+      title: "Outpatient Facilities and Support",
+      introduction: "Consultation rooms and access to hospital diagnostic services support outpatient visits. Same-day testing is available for some requests.",
+      items: ["General and specialist consultation rooms", "Hospital laboratory access", "Access to diagnostic imaging", "Same-day testing for eligible visits", "On-site outpatient pharmacy", "Appointment desk for clinic schedules"],
+    },
     locations: [
       { campus: "km14", description: "Ask the appointment desk for the clinic schedule at the main hospital." },
       { campus: "adado", description: "Outpatient consultations and specialty clinics serve the Adado community." },
@@ -116,12 +163,29 @@ export const departments = {
         { title: "Minor procedures in Adado", description: "The Adado branch also provides selected minor surgical procedures. Reception can confirm which procedures are available there and whether your visit needs to be at KM14." },
       ],
     },
-    services: [
-      { title: "General surgery", description: "Theatre teams support major and minor procedures, including laparoscopic surgery when appropriate." },
-      { title: "Obstetric surgery", description: "The obstetric theatre handles scheduled and emergency caesarean deliveries." },
-      { title: "Gynecological and orthopedic procedures", description: "The hospital also carries out selected procedures in gynecology and orthopedics." },
-    ],
-    facilities: ["Major and obstetric operating theatres", "Anesthesia workstations and monitoring", "Laparoscopic instruments", "Infection control and sterile field protocols"],
+    services: {
+      title: "Surgical Services and Procedures",
+      introduction: "Al-Birri’s theatre teams support planned and emergency procedures. The surgeon and anesthesia team explain the proposed procedure, preparation, and recovery arrangements.",
+      items: [
+        { title: "General surgery", description: "The hospital carries out major and minor general procedures. The surgical team confirms the plan and where the operation will take place." },
+        { title: "Laparoscopic procedures", description: "A laparoscopic approach is available for selected cases. Your surgeon can explain whether it is an option for your procedure." },
+        { title: "Obstetric surgery", description: "The obstetric theatre supports scheduled and emergency caesarean deliveries in coordination with the maternity team." },
+        { title: "Gynecological and orthopedic procedures", description: "The theatre supports selected procedures in gynecology and orthopedics. Check availability with the appropriate specialist team." },
+      ],
+    },
+    careNeeds: {
+      title: "Cases Supported by the Operating Theatre",
+      introduction: "The surgical team confirms which procedures each branch can provide. KM14 has major and obstetric theatres for emergency cases.",
+      groups: [
+        { title: "Planned surgery", items: ["Scheduled general surgery", "Selected minor procedures", "Planned caesarean delivery"] },
+        { title: "Urgent surgery and recovery", items: ["Emergency cases referred by a hospital clinician", "Emergency caesarean delivery", "Transfer from theatre to the ward when required"] },
+      ],
+    },
+    facilities: {
+      title: "Operating Theatre Equipment and Facilities",
+      introduction: "At KM14, dedicated major and obstetric theatres support the work of the surgical and anesthesia teams.",
+      items: ["Major operating theatre at KM14", "Obstetric operating theatre at KM14", "Anesthesia workstations", "Patient monitoring equipment", "Laparoscopic instruments", "Infection control and sterile field procedures"],
+    },
     locations: [
       { campus: "km14", description: "Major and obstetric theatres operate around the clock for emergency cases." },
       { campus: "adado", description: "The regional branch provides minor surgical procedures. Call to confirm availability." },
@@ -155,12 +219,29 @@ export const departments = {
         { title: "Specialty clinics close to home", description: "Specialist services are available at KM14, and Adado runs outpatient specialty clinics. Exact schedules vary, so check which branch offers the service you need." },
       ],
     },
-    services: [
-      { title: "Heart care and internal medicine", description: "Consult a cardiology or internal medicine specialist for assessment and follow-up." },
-      { title: "Care for children and families", description: "Specialties include pediatrics, neonatology, obstetrics, and gynecology." },
-      { title: "Surgery, ENT, and dentistry", description: "Ask the appointment desk about general surgery, ear, nose and throat, or dental consultations." },
-    ],
-    facilities: ["Specialist consultation rooms", "Hospital laboratory and imaging", "Surgical theatres", "Maternity and neonatal units"],
+    services: {
+      title: "Specialist Consultations and Services",
+      introduction: "Al-Birri’s specialists assess referrals, review previous results, and plan follow-up care. The appointment desk can direct you to the appropriate clinic.",
+      items: [
+        { title: "Cardiology and internal medicine", description: "Consult a specialist for assessment, review of existing records, or follow-up after a previous visit." },
+        { title: "Pediatrics and neonatology", description: "The hospital provides specialist services for children and newborns. Families can ask the appointment desk which team handles their referral." },
+        { title: "Obstetrics and gynecology", description: "The appointment desk can direct you to the maternity team or a gynecology clinic, depending on the purpose of your visit." },
+        { title: "General surgery, ENT, and dentistry", description: "Arrange a consultation to review a referral, discuss a planned procedure, or ask about the next step in your care." },
+      ],
+    },
+    careNeeds: {
+      title: "Types of Specialist Referrals",
+      introduction: "The clinic you need depends on your referral and the service available at each branch. Tell the appointment desk which type of assessment you have been referred for.",
+      groups: [
+        { title: "Medical and diagnostic assessments", items: ["Heart health assessment or follow-up", "Internal medicine review", "Ear, nose and throat or dental assessment"] },
+        { title: "Family care and procedures", items: ["Pediatric or newborn specialist review", "Obstetrics or gynecology consultation", "Surgical assessment before a planned procedure"] },
+      ],
+    },
+    facilities: {
+      title: "Facilities Supporting Specialist Care",
+      introduction: "Specialists can request tests and coordinate with other hospital departments when they need more information to plan your care.",
+      items: ["Specialist consultation rooms", "Hospital laboratory services", "Diagnostic imaging department", "Operating theatres", "Maternity services", "Neonatal care at KM14"],
+    },
     locations: [
       { campus: "km14", description: "Call the main hospital to confirm where your specialist is seeing patients." },
       { campus: "adado", description: "The regional branch runs outpatient specialty clinics. Schedules vary by specialty." },
@@ -194,12 +275,29 @@ export const departments = {
         { title: "Maternity services in Adado", description: "The Adado branch also offers maternal health consultations, delivery suites, and an inpatient maternity ward. The appointment desk can confirm what is available at each branch." },
       ],
     },
-    services: [
-      { title: "Antenatal care", description: "Pregnancy checkups and delivery planning for routine and high-risk pregnancies." },
-      { title: "Delivery and obstetric care", description: "The maternity and theatre teams support vaginal and caesarean deliveries, including obstetric emergencies." },
-      { title: "Postnatal and newborn care", description: "The team supports mothers during recovery and coordinates neonatal care when babies need extra monitoring." },
-    ],
-    facilities: ["Private labor rooms and recovery suites", "Obstetric operating theatre", "Neonatal Intensive Care Unit (KM14)", "24-hour emergency obstetric care"],
+    services: {
+      title: "Maternity and Newborn Care Services",
+      introduction: "Al-Birri’s maternity team supports mothers through pregnancy, delivery, and postnatal recovery. When a baby needs extra monitoring, the team coordinates with newborn care staff.",
+      items: [
+        { title: "Antenatal consultations", description: "Discuss your pregnancy, review earlier antenatal records, and plan for delivery. The team also arranges follow-up for high-risk pregnancies." },
+        { title: "Vaginal and caesarean delivery", description: "The maternity team supports vaginal delivery and works with the obstetric theatre for planned and emergency caesarean deliveries." },
+        { title: "Postnatal recovery", description: "After delivery, the team supports mothers as they recover and explains the arrangements for their stay and follow-up." },
+        { title: "Neonatal intensive care", description: "At KM14, the neonatal intensive care unit supports newborns who need specialized care or close monitoring." },
+      ],
+    },
+    careNeeds: {
+      title: "Visits and Care During Pregnancy and After Birth",
+      introduction: "The maternity team can explain which appointments and hospital services are relevant at each stage of your care.",
+      groups: [
+        { title: "Pregnancy and delivery", items: ["Routine antenatal appointments", "Follow-up for high-risk pregnancies", "Delivery planning and obstetric assessment"] },
+        { title: "After delivery", items: ["Postnatal care and recovery", "Inpatient maternity stays", "Newborn assessment and monitoring"] },
+      ],
+    },
+    facilities: {
+      title: "Maternity and Neonatal Facilities",
+      introduction: "KM14 has facilities for obstetric surgery and neonatal intensive care. The Adado branch provides maternal health consultations, delivery suites, and inpatient maternity care.",
+      items: ["Private labor rooms", "Postnatal recovery suites", "Obstetric operating theatre at KM14", "Neonatal intensive care unit at KM14", "24-hour emergency obstetric care at KM14", "Delivery suites and a maternity ward in Adado"],
+    },
     locations: [
       { campus: "km14", description: "Maternity care, obstetric surgery, and neonatal intensive care." },
       { campus: "adado", description: "Maternal health consultations, delivery suites, and an inpatient maternity ward." },
@@ -233,12 +331,29 @@ export const departments = {
         { title: "Pharmacy access in Adado", description: "The Adado branch has an on-site pharmacy for patients receiving care there. Ask the branch pharmacy to confirm stock and collection arrangements." },
       ],
     },
-    services: [
-      { title: "Prescription dispensing", description: "Pharmacy staff check and dispense prescriptions for inpatients and outpatients." },
-      { title: "Medication counseling", description: "Ask the pharmacist how to follow the prescription directions or store a medicine." },
-      { title: "Over-the-counter products", description: "Speak with the pharmacy team about available non-prescription products and their proper use." },
-    ],
-    facilities: ["Inpatient and outpatient dispensing", "Prescription double-checks", "Medicine information support", "Poison information services"],
+    services: {
+      title: "Pharmacy Services and Medicine Information",
+      introduction: "Al-Birri dispenses medicines for admitted patients and people visiting outpatient clinics. The pharmacy team checks prescriptions and can answer questions when you collect your medicine.",
+      items: [
+        { title: "Prescription dispensing", description: "Bring your prescription so pharmacy staff can check the details and dispense the items that are available." },
+        { title: "Medication counseling", description: "Ask the pharmacist to explain the directions on your prescription and any storage instructions for the medicine you collect." },
+        { title: "Over-the-counter products", description: "Pharmacy staff can tell you which non-prescription products are stocked and explain the directions on their packaging." },
+        { title: "Medicine information", description: "Contact the pharmacy if you need help understanding a medicine label or want to check availability at your preferred branch." },
+      ],
+    },
+    careNeeds: {
+      title: "How the Hospital Pharmacy Can Help",
+      introduction: "Patients and caregivers can speak to the pharmacy at the branch where they are receiving care.",
+      groups: [
+        { title: "Collecting medicines", items: ["Filling a prescription after an outpatient visit", "Dispensing medicines for admitted patients", "Checking stock before travelling"] },
+        { title: "Questions for the pharmacist", items: ["Understanding prescription directions", "Checking medicine storage instructions", "Asking about available non-prescription products"] },
+      ],
+    },
+    facilities: {
+      title: "Pharmacy Facilities and Support",
+      introduction: "KM14 and Adado have on-site hospital pharmacies. Round-the-clock dispensing is available at KM14.",
+      items: ["Inpatient and outpatient dispensing", "Prescription safety checks", "24-hour pharmacy at KM14", "On-site pharmacy in Adado", "Medicine information support", "Poison information services"],
+    },
     locations: [
       { campus: "km14", description: "The hospital pharmacy provides inpatient and outpatient dispensing around the clock." },
       { campus: "adado", description: "The regional hospital has an on-site pharmacy. Call to check stock before travelling." },
@@ -272,12 +387,29 @@ export const departments = {
         { title: "On-site testing in Adado", description: "The Adado branch offers laboratory services and blood testing. You can check with reception before travelling to confirm that the requested test is available there." },
       ],
     },
-    services: [
-      { title: "Hematology and biochemistry", description: "The lab processes tests requested by your clinician to assess blood cells and other blood markers." },
-      { title: "Serology and parasitology", description: "Dedicated sections handle selected tests for immune responses and parasites." },
-      { title: "Blood typing and transfusion support", description: "The laboratory provides blood grouping and testing to support the hospital’s transfusion service." },
-    ],
-    facilities: ["Automated laboratory analyzers", "Dedicated testing sections", "Blood typing facilities", "24-hour laboratory service at KM14"],
+    services: {
+      title: "Laboratory Tests and Diagnostic Services",
+      introduction: "Al-Birri’s laboratory processes clinician-requested samples. The desk can confirm what the requested test requires, where to submit a sample, and when the report is expected.",
+      items: [
+        { title: "Hematology", description: "The hematology section handles clinician-requested testing related to blood cells." },
+        { title: "Biochemistry", description: "The biochemistry section processes tests that measure chemical markers in patient samples." },
+        { title: "Serology and parasitology", description: "Dedicated sections handle selected tests related to immune responses and parasites. Ask about availability for the specific test on your referral." },
+        { title: "Blood typing and transfusion support", description: "The KM14 laboratory provides blood grouping and related testing for the hospital’s transfusion service." },
+      ],
+    },
+    careNeeds: {
+      title: "When Laboratory Testing Is Requested",
+      introduction: "Your clinician selects the tests needed for your assessment or follow-up. If you have a request, the laboratory can confirm where the test is available.",
+      groups: [
+        { title: "Assessment and follow-up", items: ["Tests requested at an outpatient appointment", "Laboratory testing during an inpatient stay", "Repeat tests requested to review progress"] },
+        { title: "Samples and reports", items: ["Questions about preparation for a requested test", "Submitting a sample with a test request", "Collecting the report for your clinician"] },
+      ],
+    },
+    facilities: {
+      title: "Laboratory Equipment and Facilities",
+      introduction: "Automated analyzers support sample testing at the KM14 main laboratory. The Adado branch also provides on-site laboratory services and blood testing.",
+      items: ["Automated analyzers at KM14", "Hematology and biochemistry sections", "Serology and parasitology sections", "Blood typing facilities at KM14", "24-hour laboratory service at KM14", "On-site laboratory testing in Adado"],
+    },
     locations: [
       { campus: "km14", description: "Automated laboratory, blood typing, and transfusion support." },
       { campus: "adado", description: "On-site laboratory and blood testing. Confirm the availability of your requested test with reception." },
@@ -311,12 +443,29 @@ export const departments = {
         { title: "Service confirmation before travelling", description: "The radiology desk can confirm whether your requested examination is available at KM14 and explain scheduling so you know where and when to go." },
       ],
     },
-    services: [
-      { title: "Digital X-ray", description: "The imaging team carries out X-ray examinations according to the clinician’s request." },
-      { title: "Ultrasound", description: "The department provides high-resolution ultrasound examinations, with preparation depending on the scan." },
-      { title: "Fluoroscopy", description: "Ask the radiology desk about availability and preparation for a requested fluoroscopy examination." },
-    ],
-    facilities: ["Digital X-ray equipment", "High-resolution ultrasound systems", "Radiologists and imaging technicians", "Imaging reports for the referring care team"],
+    services: {
+      title: "Radiology and Diagnostic Imaging Services",
+      introduction: "The imaging department uses your clinician’s request to identify the examination you need. Digital X-ray and high-resolution ultrasound are available at the KM14 main hospital.",
+      items: [
+        { title: "Digital X-ray", description: "Radiology staff carry out the X-ray examination requested by your clinician and explain how to collect the report." },
+        { title: "High-resolution ultrasound", description: "The department provides ultrasound examinations. Staff can confirm the scan on your referral and explain any preparation it requires." },
+        { title: "Fluoroscopy enquiries", description: "If your clinician has requested fluoroscopy, ask the radiology desk about availability and arrangements for the examination." },
+        { title: "Imaging reports", description: "Ask the imaging desk when the report will be available for review by your referring clinician." },
+      ],
+    },
+    careNeeds: {
+      title: "Common Reasons for an Imaging Visit",
+      introduction: "Your clinician decides which examination to request. The imaging desk can explain what to bring and whether preparation is needed.",
+      groups: [
+        { title: "New imaging referrals", items: ["A clinician-requested digital X-ray", "A referral for an ultrasound examination", "An enquiry about a specific examination listed on your request"] },
+        { title: "Follow-up and reports", items: ["Repeat imaging requested by your care team", "Sharing previous scans or reports", "Collecting an imaging report for your clinician"] },
+      ],
+    },
+    facilities: {
+      title: "Imaging Technology and Facilities",
+      introduction: "Radiologists and imaging technicians support diagnostic imaging at KM14, where the department has digital X-ray and high-resolution ultrasound systems.",
+      items: ["Digital X-ray equipment at KM14", "High-resolution ultrasound systems", "Radiologists and imaging technicians", "Imaging reports for referring clinicians"],
+    },
     locations: [
       { campus: "km14", description: "Digital X-ray and ultrasound are available at the main hospital. Call to check your specific examination." },
     ],

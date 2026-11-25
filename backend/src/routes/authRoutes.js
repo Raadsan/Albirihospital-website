@@ -1,14 +1,13 @@
 import { Router } from "express";
-import { register, login, getMe } from "../controllers/authController.js";
-import { protect } from "../middlewares/authMiddleware.js";
+import { register, login, getMe, changePassword } from "../controllers/authController.js";
+import { authorizeRoles, protect } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
-// Public routes
-router.post("/register", register);
 router.post("/login", login);
 
-// Protected routes (Requires valid Bearer Token)
+router.post("/register", protect, authorizeRoles("ADMIN"), register);
 router.get("/me", protect, getMe);
+router.patch("/password", protect, changePassword);
 
 export default router;

@@ -6,6 +6,7 @@ import Image from "next/image"
 
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
+import { useAdminUser } from "@/components/admin-session-provider"
 import {
   Sidebar,
   SidebarContent,
@@ -26,11 +27,6 @@ import {
 } from "lucide-react"
 
 const data = {
-  user: {
-    name: "Albiri Admin",
-    email: "admin@albirihospital.com",
-    avatar: "",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -71,6 +67,8 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const user = useAdminUser()
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader className="border-b border-sidebar-border/40 py-2.5">
@@ -99,7 +97,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={{ ...user, avatar: "" }} />
       </SidebarFooter>
     </Sidebar>
   )

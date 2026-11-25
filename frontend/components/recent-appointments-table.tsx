@@ -23,7 +23,7 @@ import {
 } from "lucide-react"
 import { toast } from "react-toastify"
 
-import api from "@/app/api/api"
+import { adminApi as api } from "@/app/api/api"
 import { getApiErrorMessage } from "@/lib/api-error"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"

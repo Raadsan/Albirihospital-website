@@ -7,15 +7,17 @@ const api = axios.create({
     },
 });
 
-// Auto-attach JWT token if present in localStorage
-api.interceptors.request.use((config) => {
-    if (typeof window !== "undefined") {
-        const token = localStorage.getItem("token");
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
+export const adminApi = axios.create({
+    baseURL: "/api/admin",
+    headers: { "X-Requested-With": "XMLHttpRequest" },
+});
+
+adminApi.interceptors.response.use((response) => response, (error: unknown) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401 &&
+        error.config?.url !== "/session" && typeof window !== "undefined") {
+        window.location.replace("/admin/login");
     }
-    return config;
+    return Promise.reject(error);
 });
 
 export default api;

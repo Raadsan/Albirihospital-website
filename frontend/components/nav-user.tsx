@@ -1,7 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "react-toastify"
+import { adminApi } from "@/app/api/api"
 
 import {
   Avatar,
@@ -23,7 +25,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { EllipsisVerticalIcon, CircleUserRoundIcon, CreditCardIcon, BellIcon, LogOutIcon } from "lucide-react"
+import { EllipsisVerticalIcon, KeyRoundIcon, CreditCardIcon, BellIcon, LogOutIcon } from "lucide-react"
 
 export function NavUser({
   user,
@@ -36,15 +38,17 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const router = useRouter()
+  const [loggingOut, setLoggingOut] = useState(false)
 
-  function handleLogout() {
-    window.localStorage.removeItem("token")
-    window.localStorage.removeItem("albiri_admin_user")
-    document.cookie =
-      "albiri_demo_admin=; path=/; max-age=0; samesite=lax"
-    toast.success("You have been logged out successfully.")
-    router.replace("/admin/login")
-    router.refresh()
+  async function handleLogout() {
+    setLoggingOut(true)
+    try {
+      await adminApi.delete("/session")
+      window.location.replace("/admin/login")
+    } catch {
+      setLoggingOut(false)
+      toast.error("Could not sign out. Please try again.")
+    }
   }
 
   return (
@@ -92,10 +96,9 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <CircleUserRoundIcon
-                />
-                Account
+              <DropdownMenuItem onClick={() => router.push("/admin/dashboard/password")}>
+                <KeyRoundIcon />
+                Change password
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCardIcon
@@ -109,7 +112,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem onClick={handleLogout} disabled={loggingOut}>
               <LogOutIcon
               />
               Log out

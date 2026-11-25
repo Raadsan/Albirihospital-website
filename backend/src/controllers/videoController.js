@@ -12,7 +12,7 @@ export async function getVideos(req, res) {
     const where = {};
 
     // If 'all' is not true, show only published videos to public
-    if (all !== "true") {
+    if (all !== "true" || req.user?.role !== "ADMIN") {
       where.published = true;
     }
 
@@ -62,7 +62,7 @@ export async function getVideoById(req, res) {
     const { id } = req.params;
 
     const video = await prisma.video.findUnique({
-      where: { id },
+      where: { id, published: true },
     });
 
     if (!video) {

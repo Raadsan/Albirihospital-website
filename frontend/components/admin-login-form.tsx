@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import { LockKeyholeIcon, Loader2Icon } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -15,14 +14,10 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import api from "@/app/api/api";
+import { adminApi } from "@/app/api/api";
 import { getApiErrorMessage } from "@/lib/api-error";
 
-const DEFAULT_EMAIL = "admin@albirihospital.com";
-const DEFAULT_PASSWORD = "Admin@Albiri2026!";
-
 export function AdminLoginForm() {
-  const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -36,59 +31,22 @@ export function AdminLoginForm() {
     const password = String(formData.get("password") ?? "");
 
     try {
-      const response = await api.post("/auth/login", { email, password });
-      if (response.data && response.data.token) {
-        window.localStorage.setItem("token", response.data.token);
-        window.localStorage.setItem(
-          "albiri_admin_user",
-          JSON.stringify(response.data.user || { name: "Albiri Admin", email, role: "ADMIN" })
-        );
-        document.cookie =
-          "albiri_demo_admin=1; path=/; max-age=604800; samesite=lax";
-
-        toast.success("Welcome back! Opening the admin dashboard.");
-        router.replace("/admin/dashboard");
-        router.refresh();
-        return;
-      }
+      await adminApi.post("/session", { email, password });
     } catch (err: unknown) {
-      console.warn("API Login failed, testing demo fallback:", err);
-
-      // Local fallback if server has issues or credentials match demo admin
-      const isDemoAdmin =
-        (email === DEFAULT_EMAIL && password === DEFAULT_PASSWORD) ||
-        (email === "admin@albiri.so" && password === "admin123");
-
-      if (isDemoAdmin) {
-        window.localStorage.setItem(
-          "albiri_admin_user",
-          JSON.stringify({
-            id: "admin-1",
-            name: "Albiri Admin",
-            email,
-            role: "ADMIN",
-          })
-        );
-        document.cookie =
-          "albiri_demo_admin=1; path=/; max-age=604800; samesite=lax";
-
-        toast.success("Welcome back! Opening the admin dashboard.");
-        router.replace("/admin/dashboard");
-        router.refresh();
-        return;
-      }
-
-      const apiError = getApiErrorMessage(
-        err,
-        "Invalid email or password. Please check your credentials."
-      );
+      const apiError = getApiErrorMessage(err, "Sign-in failed. Please try again.");
       setError(apiError);
       toast.error(apiError);
       setLoading(false);
       return;
     }
 
-    setLoading(false);
+    try {
+      window.localStorage.removeItem("token");
+      window.localStorage.removeItem("albiri_admin_user");
+    } catch {
+      // Some browsers block web storage. The session cookie is already set.
+    }
+    window.location.replace("/admin/dashboard");
   }
 
   return (
@@ -112,9 +70,7 @@ export function AdminLoginForm() {
               id="email"
               name="email"
               type="email"
-              placeholder="admin@albirihospital.com"
-              defaultValue={DEFAULT_EMAIL}
-              autoComplete="email"
+              autoComplete="username"
               className="h-10"
               required
             />
@@ -126,11 +82,8 @@ export function AdminLoginForm() {
               id="password"
               name="password"
               type="password"
-              placeholder="••••••••"
-              defaultValue={DEFAULT_PASSWORD}
               autoComplete="current-password"
               className="h-10"
-              minLength={6}
               required
             />
           </div>
@@ -143,12 +96,6 @@ export function AdminLoginForm() {
               {error}
             </p>
           ) : null}
-
-          <div className="rounded-lg border border-emerald-200 bg-secondary/55 px-3 py-2 text-xs leading-5 text-secondary-foreground">
-            <p className="font-semibold">Hospital Admin Access</p>
-            <p>Email: <span className="font-mono">{DEFAULT_EMAIL}</span></p>
-            <p>Password: <span className="font-mono">{DEFAULT_PASSWORD}</span></p>
-          </div>
 
           <Button
             type="submit"

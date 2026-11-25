@@ -44,7 +44,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import api from "@/app/api/api"
+import { adminApi as api } from "@/app/api/api"
 import { getApiErrorMessage } from "@/lib/api-error"
 
 export type AppointmentStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED"

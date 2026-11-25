@@ -1,17 +1,20 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { AdminSessionProvider } from "@/components/admin-session-provider";
+import { getAdminUser } from "@/lib/admin-session";
 
 export default async function AdminDashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const isDemoAdmin =
-    (await cookies()).get("albiri_demo_admin")?.value === "1";
-
-  if (!isDemoAdmin) {
+  const user = await getAdminUser();
+  if (!user) {
     redirect("/admin/login");
   }
 
-  return <div className="admin-dashboard">{children}</div>;
+  return (
+    <AdminSessionProvider user={user}>
+      <div className="admin-dashboard">{children}</div>
+    </AdminSessionProvider>
+  );
 }

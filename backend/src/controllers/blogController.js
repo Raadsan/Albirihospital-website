@@ -27,7 +27,7 @@ export async function getBlogs(req, res) {
     const where = {};
 
     // Only show published articles unless explicitly requested by admin
-    if (all !== "true") {
+    if (all !== "true" || req.user?.role !== "ADMIN") {
       where.published = true;
     }
 
@@ -78,6 +78,7 @@ export async function getBlogByIdOrSlug(req, res) {
     // Search by either ID or unique Slug
     let blog = await prisma.blog.findFirst({
       where: {
+        published: true,
         OR: [{ id: idOrSlug }, { slug: idOrSlug }],
       },
     });

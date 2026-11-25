@@ -1,102 +1,47 @@
-import { verifyToken } from "../utils/jwt.js";
+import { credentialVersion, verifyToken } from "../utils/jwt.js";
 import { prisma } from "../db.js";
 
-/**
- * Middleware to protect routes and verify JWT token
- */
-export async function protect(req, res, next) {
-  let token;
+function unauthorized(res) {
+  return res.status(401).json({
+    success: false,
+    error: "Please sign in with a valid session.",
+  });
+}
 
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    token = authHeader.split(" ")[1];
+export async function protect(req, res, next) {
+  res.set("Cache-Control", "private, no-store");
+  const token = /^Bearer ([^\s]+)$/i.exec(req.headers.authorization ?? "")?.[1];
+  if (!token) return unauthorized(res);
+
+  let claims;
+  try {
+    claims = verifyToken(token);
+  } catch {
+    return unauthorized(res);
   }
 
-  // If token is missing, "demo-admin-token", or "null", fall back to default Admin user
-  if (!token || token === "demo-admin-token" || token === "null" || token === "undefined") {
-    try {
-      const fallbackAdmin = await prisma.user.findFirst({
-        where: { role: "ADMIN" },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          createdAt: true,
-        },
-      });
-      if (fallbackAdmin) {
-        req.user = fallbackAdmin;
-        return next();
-      }
-    } catch (dbErr) {
-      console.error("Auth fallback admin lookup error:", dbErr);
-    }
-
-    return res.status(401).json({
-      success: false,
-      error: "Unauthorized: No token provided.",
-    });
+  if (typeof claims?.id !== "string" || typeof claims.version !== "string") {
+    return unauthorized(res);
   }
 
   try {
-    const decoded = verifyToken(token);
-
-    // Get user from database without password
     const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
+      where: { id: claims.id },
+      select: { id: true, name: true, email: true, role: true, createdAt: true, password: true },
     });
 
-    if (!user) {
-      // Fallback to admin if token user not found
-      const fallbackAdmin = await prisma.user.findFirst({
-        where: { role: "ADMIN" },
-        select: { id: true, name: true, email: true, role: true, createdAt: true },
-      });
-      if (fallbackAdmin) {
-        req.user = fallbackAdmin;
-        return next();
-      }
-      return res.status(401).json({
-        success: false,
-        error: "Unauthorized: User account not found.",
-      });
+    if (!user || claims.version !== credentialVersion(user.password)) {
+      return unauthorized(res);
     }
 
-    req.user = user;
+    const { password, ...profile } = user;
+    req.user = profile;
     next();
-  } catch (err) {
-    // If token is invalid or expired, check fallback admin
-    try {
-      const fallbackAdmin = await prisma.user.findFirst({
-        where: { role: "ADMIN" },
-        select: { id: true, name: true, email: true, role: true, createdAt: true },
-      });
-      if (fallbackAdmin) {
-        req.user = fallbackAdmin;
-        return next();
-      }
-    } catch (e) {}
-
-    return res.status(401).json({
-      success: false,
-      error: "Unauthorized: Invalid or expired token.",
-    });
+  } catch (error) {
+    next(error);
   }
 }
 
-
-/**
- * Middleware to restrict access based on roles
- * @param  {...string} roles - e.g. "ADMIN", "DOCTOR"
- */
 export function authorizeRoles(...roles) {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {
@@ -107,4 +52,9 @@ export function authorizeRoles(...roles) {
     }
     next();
   };
+}
+
+export function requireAdminForDrafts(req, res, next) {
+  if (req.query.all !== "true") return next();
+  return protect(req, res, () => authorizeRoles("ADMIN")(req, res, next));
 }

@@ -1,16 +1,28 @@
+import "dotenv/config";
+import { createHmac } from "node:crypto";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-const JWT_SECRET = process.env.JWT_SECRET || "albiri_hospital_default_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET is required for authentication.");
+}
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 
-/**
- * Generate a signed JWT token
- * @param {object} payload - Data to embed in token (e.g. { id, email, role })
- * @returns {string} JWT Token
- */
-export function generateToken(payload) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+// Bind each session to the current password without including the password hash.
+export function credentialVersion(passwordHash) {
+  return createHmac("sha256", JWT_SECRET)
+    .update("albiri-credential-version:")
+    .update(passwordHash)
+    .digest("base64url");
+}
+
+export function generateToken(user) {
+  return jwt.sign(
+    { id: user.id, email: user.email, role: user.role, version: credentialVersion(user.password) },
+    JWT_SECRET,
+    { algorithm: "HS256", expiresIn: JWT_EXPIRES_IN },
+  );
 }
 
 /**
@@ -19,7 +31,7 @@ export function generateToken(payload) {
  * @returns {object} Decoded token payload
  */
 export function verifyToken(token) {
-  return jwt.verify(token, JWT_SECRET);
+  return jwt.verify(token, JWT_SECRET, { algorithms: ["HS256"] });
 }
 
 /**
