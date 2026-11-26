@@ -7,6 +7,7 @@ import Image from "next/image"
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import { useAdminUser } from "@/components/admin-session-provider"
+import { canAccessDashboard, type DashboardSection } from "@/lib/dashboard-access"
 import {
   Sidebar,
   SidebarContent,
@@ -24,10 +25,10 @@ import {
   VideoIcon,
   MailIcon,
   AwardIcon,
+  UserCogIcon,
 } from "lucide-react"
 
-const data = {
-  navMain: [
+const navigation: Array<{title: string; url: string; icon: React.ReactNode; section?: DashboardSection | "users"}> = [
     {
       title: "Dashboard",
       url: "/admin/dashboard",
@@ -35,36 +36,47 @@ const data = {
     },
     {
       title: "Appointments",
+      section: "appointments",
       url: "/admin/dashboard/appointments",
       icon: <CalendarDaysIcon />,
     },
     {
       title: "Inquiries & Messages",
+      section: "contact",
       url: "/admin/dashboard/messages",
       icon: <MailIcon />,
     },
     {
       title: "Doctors",
+      section: "doctors",
       url: "/admin/dashboard/doctors",
       icon: <UsersIcon />,
     },
     {
       title: "Leadership Team",
+      section: "leadership",
       url: "/admin/dashboard/leadership",
       icon: <AwardIcon />,
     },
     {
       title: "News & Blogs",
+      section: "blogs",
       url: "/admin/dashboard/blogs",
       icon: <FileTextIcon />,
     },
     {
       title: "Health Videos",
+      section: "videos",
       url: "/admin/dashboard/videos",
       icon: <VideoIcon />,
     },
-  ],
-}
+    {
+      title: "Users",
+      section: "users",
+      url: "/admin/dashboard/users",
+      icon: <UserCogIcon />,
+    },
+]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAdminUser()
@@ -94,7 +106,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navigation.filter(({ section }) => !section || canAccessDashboard(user, section))} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={{ ...user, avatar: "" }} />

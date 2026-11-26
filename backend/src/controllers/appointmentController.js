@@ -26,13 +26,26 @@ export async function createAppointment(req, res) {
       });
     }
 
+    const selectedDoctorId = doctorId?.trim() || null;
+    if (selectedDoctorId) {
+      const doctor = await prisma.doctor.findUnique({
+        where: { id: selectedDoctorId },
+      });
+      if (doctor?.employmentStatus === "FORMER") {
+        return res.status(400).json({
+          success: false,
+          error: "Dhakhtarkani hadda kama shaqeeyo isbitaalka. Fadlan dooro dhakhtar kale. (Please choose a current doctor.)",
+        });
+      }
+    }
+
     const newAppointment = await prisma.appointment.create({
       data: {
         name: name.trim(),
         phone: phone.trim(),
         email: email ? email.trim().toLowerCase() : null,
         department: department ? department.trim().toLowerCase() : "general",
-        doctorId: doctorId ? doctorId.trim() : null,
+        doctorId: selectedDoctorId,
         doctorName: doctorName ? doctorName.trim() : null,
         date: date.trim(),
         time: time.trim(),
@@ -58,7 +71,7 @@ export async function createAppointment(req, res) {
 /**
  * @desc    Get all appointments (Filterable by status, department, search, date)
  * @route   GET /api/appointments
- * @access  Private (ADMIN, RECEPTIONIST)
+ * @access  Private (ADMIN)
  */
 export async function getAppointments(req, res) {
   try {
@@ -108,7 +121,7 @@ export async function getAppointments(req, res) {
 /**
  * @desc    Get single appointment by ID
  * @route   GET /api/appointments/:id
- * @access  Private (ADMIN, RECEPTIONIST)
+ * @access  Private (ADMIN)
  */
 export async function getAppointmentById(req, res) {
   try {
@@ -141,7 +154,7 @@ export async function getAppointmentById(req, res) {
 /**
  * @desc    Update appointment status (CONFIRMED, CANCELLED, COMPLETED)
  * @route   PATCH /api/appointments/:id/status
- * @access  Private (ADMIN, RECEPTIONIST)
+ * @access  Private (ADMIN)
  */
 export async function updateAppointmentStatus(req, res) {
   try {

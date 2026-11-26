@@ -14,7 +14,7 @@ export async function uploadSingleImage(req, res) {
       });
     }
 
-    const folder = req.body.folder || "uploads";
+    const folder = req.uploadFolder ?? req.body.folder ?? "uploads";
     const result = await uploadFile(
       req.file.buffer,
       req.file.originalname,

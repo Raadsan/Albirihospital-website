@@ -12,15 +12,24 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      Role     @default(ADMIN)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String           @id @default(uuid())
+  name            String
+  email           String           @unique
+  password        String
+  role            Role             @default(ADMIN)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  dashboardAccess DashboardAccess?
 
   @@map("users")
+}
+
+model DashboardAccess {
+  userId      String @id
+  permissions Json
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("dashboard_access")
 }
 
 enum AppointmentStatus {
@@ -48,20 +57,26 @@ model Appointment {
   @@map("appointments")
 }
 
+enum DoctorEmploymentStatus {
+  CURRENT
+  FORMER
+}
+
 model Doctor {
-  id          String   @id @default(uuid())
-  name        String
-  title       String
-  specialty   String
-  badge       String   @default("Specialist")
-  image       String   @db.Text
-  details     String?  @db.Text
-  department  String?
-  experience  String?
-  available   Boolean  @default(true)
-  featured    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String                 @id @default(uuid())
+  name             String
+  title            String
+  specialty        String
+  badge            String                 @default("Specialist")
+  image            String                 @db.Text
+  details          String?                @db.Text
+  department       String?
+  experience       String?
+  employmentStatus DoctorEmploymentStatus @default(CURRENT)
+  available        Boolean                @default(true)
+  featured         Boolean                @default(false)
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
 
   @@map("doctors")
 }

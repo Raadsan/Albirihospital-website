@@ -19,10 +19,6 @@ export function MissionAndVision() {
                 aria-hidden="true"
                 className="absolute -left-32 top-12 size-80 rounded-full bg-blue-100/60 blur-3xl"
             />
-            <div
-                aria-hidden="true"
-                className="absolute -right-24 bottom-0 size-72 rounded-full bg-emerald-100/60 blur-3xl"
-            />
 
             <div className="relative mx-auto max-w-7xl">
                 <motion.div
@@ -82,27 +78,21 @@ export function MissionAndVision() {
                         viewport={{ once: true, amount: 0.25 }}
                         transition={{ duration: 0.7, delay: prefersReducedMotion ? 0 : 0.1, ease: [0.22, 1, 0.36, 1] }}
                         whileHover={prefersReducedMotion ? undefined : { y: -7 }}
-                        className="group relative overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-7 shadow-[0_18px_50px_rgba(15,23,42,0.08)] sm:p-10"
+                        className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-[0_18px_50px_rgba(15,23,42,0.08)] sm:p-10"
                     >
-                        <div
-                            aria-hidden="true"
-                            className="absolute -bottom-20 -right-14 size-56 rounded-full bg-emerald-50 transition-transform duration-700 group-hover:scale-110"
-                        />
-                        <div className="relative">
-                            <div className="flex size-14 items-center justify-center rounded-2xl bg-blue-50 text-[#1E40AF]">
-                                <Eye aria-hidden="true" className="size-7" />
-                            </div>
-                            <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-emerald-600">
-                                Our vision
-                            </p>
-                            <h3 className="mt-3 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">
-                                A healthier future for every community.
-                            </h3>
-                            <p className="mt-5 max-w-xl leading-7 text-slate-600">
-                                To be a trusted leader in healthcare across Somalia, recognised for clinical
-                                excellence, innovation, and an exceptional patient experience.
-                            </p>
+                        <div className="flex size-14 items-center justify-center rounded-2xl bg-blue-50 text-[#1E40AF]">
+                            <Eye aria-hidden="true" className="size-7" />
                         </div>
+                        <p className="mt-8 text-xs font-bold uppercase tracking-[0.2em] text-emerald-600">
+                            Our vision
+                        </p>
+                        <h3 className="mt-3 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl">
+                            A healthier future for every community.
+                        </h3>
+                        <p className="mt-5 max-w-xl leading-7 text-slate-600">
+                            To be a trusted leader in healthcare across Somalia, recognised for clinical
+                            excellence, innovation, and an exceptional patient experience.
+                        </p>
                     </motion.article>
                 </div>
 

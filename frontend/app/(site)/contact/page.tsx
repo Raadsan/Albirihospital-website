@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
+import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { Phone, MapPin, Clock3, Mail, Send, CheckCircle2, ArrowUpRight, Loader2 } from "lucide-react";
 import { AboutBanner } from "@/components/About/AboutBanner";
@@ -91,52 +92,54 @@ export default function ContactPage() {
         </div>
 
         <div className="relative mx-auto max-w-7xl">
-          <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-            
-            {/* Contact details */}
-            <motion.div 
+          <div className="max-w-2xl">
+            <span className="text-sm font-bold uppercase tracking-[0.2em] text-[#10b981]">
+              GET IN TOUCH
+            </span>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+              We&apos;re Here to Help You and Your Family
+            </h2>
+            <p className="mt-5 text-base leading-7 text-slate-600">
+              Have questions or need assistance? Please don&apos;t hesitate to reach out. Our professional team is always ready to support you.
+            </p>
+          </div>
+
+          <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {contactInfos.map(({ icon: Icon, title, value, desc, href, bg, color }) => (
+              <li key={title} className="flex min-w-0 items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow duration-300 hover:shadow-md xl:p-5">
+                <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${bg} ${color}`}>
+                  <Icon className="size-5" aria-hidden="true" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold text-slate-900">{title}</h3>
+                  {href !== "#" ? (
+                    <a href={href} className="mt-1 block wrap-break-word text-sm font-semibold text-slate-800 transition-colors hover:text-[#1e40af]">
+                      {value}
+                    </a>
+                  ) : (
+                    <p className="mt-1 text-sm font-semibold text-slate-800">{value}</p>
+                  )}
+                  <p className="mt-1 text-xs leading-relaxed text-slate-500">{desc}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-8 grid gap-6 lg:grid-cols-12 lg:gap-8">
+            <motion.div
               initial={prefersReducedMotion ? false : { opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="lg:col-span-5 flex flex-col justify-center"
+              className="relative aspect-[8/5] max-h-80 overflow-hidden rounded-3xl border border-slate-200 bg-blue-50 shadow-sm lg:col-span-5 lg:aspect-auto lg:min-h-80 lg:max-h-none"
             >
-              <span className="text-sm font-bold uppercase tracking-[0.2em] text-[#10b981]">
-                GET IN TOUCH
-              </span>
-              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                We&apos;re Here to Help You and Your Family
-              </h2>
-              <p className="mt-5 text-base leading-7 text-slate-600">
-                Have questions or need assistance? Please don&apos;t hesitate to reach out. Our professional team is always ready to support you.
-              </p>
-
-              <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
-                {contactInfos.map((info, idx) => {
-                  const Icon = info.icon;
-                  return (
-                    <div 
-                      key={idx}
-                      className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm hover:shadow-md transition-all duration-300"
-                    >
-                      <div className={`rounded-xl p-3 ${info.bg} ${info.color} shrink-0`}>
-                        <Icon className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-bold text-slate-900">{info.title}</h3>
-                        {info.href !== "#" ? (
-                          <a href={info.href} className="mt-1 block font-semibold text-slate-800 hover:text-[#1e40af] transition-colors">
-                            {info.value}
-                          </a>
-                        ) : (
-                          <p className="mt-1 font-semibold text-slate-800">{info.value}</p>
-                        )}
-                        <p className="mt-1 text-xs text-slate-500 leading-relaxed">{info.desc}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <Image
+                src="/images/nursingcall.png"
+                alt="An Albirri Hospital nurse answering the phone"
+                fill
+                sizes="(min-width: 1280px) 500px, (min-width: 1024px) 40vw, 100vw"
+                className="object-cover object-[center_18%] lg:object-center"
+              />
             </motion.div>
 
             {/* Contact form card */}

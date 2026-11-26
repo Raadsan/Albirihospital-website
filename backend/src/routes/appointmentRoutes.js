@@ -6,19 +6,17 @@ import {
   updateAppointmentStatus,
   deleteAppointment,
 } from "../controllers/appointmentController.js";
-import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
+import { protect, authorizeRoles, authorizeSection } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
 // Public: Anyone can request an appointment booking from the website
 router.post("/", createAppointment);
 
-// Protected: ADMIN and RECEPTIONIST can view list, view single, and update status
-router.get("/", protect, authorizeRoles("ADMIN", "RECEPTIONIST"), getAppointments);
-router.get("/:id", protect, authorizeRoles("ADMIN", "RECEPTIONIST"), getAppointmentById);
-router.patch("/:id/status", protect, authorizeRoles("ADMIN", "RECEPTIONIST"), updateAppointmentStatus);
-
-// Admin only: Can delete an appointment record
+// Staff assigned to Appointments can view requests and update their status.
+router.get("/", protect, authorizeSection("appointments"), getAppointments);
+router.get("/:id", protect, authorizeSection("appointments"), getAppointmentById);
+router.patch("/:id/status", protect, authorizeSection("appointments"), updateAppointmentStatus);
 router.delete("/:id", protect, authorizeRoles("ADMIN"), deleteAppointment);
 
 export default router;

@@ -1,4 +1,5 @@
 import { prisma } from "../db.js";
+import { canAccessSection } from "../utils/dashboardAccess.js";
 
 /**
  * Generate URL-friendly slug from title
@@ -26,8 +27,7 @@ export async function getBlogs(req, res) {
 
     const where = {};
 
-    // Only show published articles unless explicitly requested by admin
-    if (all !== "true" || req.user?.role !== "ADMIN") {
+    if (all !== "true" || !canAccessSection(req.user, "blogs")) {
       where.published = true;
     }
 

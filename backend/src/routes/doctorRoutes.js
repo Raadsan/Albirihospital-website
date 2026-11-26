@@ -6,7 +6,7 @@ import {
   updateDoctor,
   deleteDoctor,
 } from "../controllers/doctorController.js";
-import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
+import { protect, authorizeRoles, authorizeSection } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
@@ -14,9 +14,9 @@ const router = Router();
 router.get("/", getDoctors);
 router.get("/:id", getDoctorById);
 
-// Admin only routes (Only ADMIN can add, update, or remove doctors)
-router.post("/", protect, authorizeRoles("ADMIN"), createDoctor);
-router.patch("/:id", protect, authorizeRoles("ADMIN"), updateDoctor);
+// Staff assigned to Doctors can add and edit profiles. Deletion is admin-only.
+router.post("/", protect, authorizeSection("doctors"), createDoctor);
+router.patch("/:id", protect, authorizeSection("doctors"), updateDoctor);
 router.delete("/:id", protect, authorizeRoles("ADMIN"), deleteDoctor);
 
 export default router;

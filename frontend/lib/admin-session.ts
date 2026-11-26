@@ -2,11 +2,13 @@ import "server-only"
 
 import { cache } from "react"
 import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
+import { canAccessDashboard, isDashboardSection, type DashboardSection, type DashboardAccess } from "@/lib/dashboard-access"
 
-export type AdminUser = {
+export type AdminUser = DashboardAccess & {
+  id: string
   name: string
   email: string
-  role: "ADMIN" | "RECEPTIONIST"
 }
 
 export const adminSessionCookie = "albiri_admin_session"
@@ -46,9 +48,21 @@ export const getAdminUser = cache(async (): Promise<AdminUser | null> => {
 
     const { user } = await response.json()
     if (user?.role !== "ADMIN" && user?.role !== "RECEPTIONIST") return null
+    if (typeof user.id !== "string" || !user.id) return null
+    const permissions: DashboardSection[] = Array.isArray(user.permissions) ? user.permissions.filter(isDashboardSection) : []
+    if (user.role === "RECEPTIONIST" && !permissions.length) return null
 
-    return { name: user.name, email: user.email, role: user.role }
+    return { id: user.id, name: user.name, email: user.email, role: user.role, permissions }
   } catch {
     return null
   }
 })
+
+export function dashboardSectionLayout(section: DashboardSection | "users") {
+  return async function SectionLayout({ children }: { children: React.ReactNode }) {
+    const user = await getAdminUser()
+    if (!user) redirect("/admin/login")
+    if (!canAccessDashboard(user, section)) redirect("/admin/dashboard")
+    return children
+  }
+}

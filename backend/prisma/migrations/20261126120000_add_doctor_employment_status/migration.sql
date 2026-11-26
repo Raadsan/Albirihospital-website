@@ -1,0 +1,2 @@
+ALTER TABLE `doctors`
+ADD COLUMN `employmentStatus` ENUM('CURRENT', 'FORMER') NOT NULL DEFAULT 'CURRENT';

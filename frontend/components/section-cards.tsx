@@ -88,13 +88,13 @@ export function SectionCards() {
           <CardAction>
             <Badge variant="outline" className="border-emerald-200 bg-secondary/60 text-secondary-foreground">
               <Stethoscope className="size-3.5 mr-1" />
-              Active
+              Directory
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Active medical practitioners
+            Current and former doctors
           </div>
           <div className="text-muted-foreground">Managed via Dashboard</div>
         </CardFooter>

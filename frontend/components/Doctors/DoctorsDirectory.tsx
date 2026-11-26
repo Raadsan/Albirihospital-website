@@ -20,21 +20,14 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/components/language-provider"
+import type { Doctor } from "@/lib/doctors"
 import api from "@/app/api/api"
 
-export interface Doctor {
-  id: string
-  name: string
-  title: string
-  specialty: string
-  badge: string
-  image: string
-  details?: string | null
-  department?: string | null
-  experience?: string | null
-  available: boolean
-  featured: boolean
-}
+const DOCTOR_FILTERS = [
+  { value: "CURRENT", label: "Current Doctors" },
+  { value: "DUTY", label: "On Duty Now" },
+  { value: "FORMER", label: "Former Doctors" },
+] as const
 
 const DEPARTMENTS = [
   "ALL",
@@ -54,7 +47,7 @@ export function DoctorsDirectory() {
   const [loading, setLoading] = React.useState(true)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [selectedDept, setSelectedDept] = React.useState<string>("ALL")
-  const [filterDuty, setFilterDuty] = React.useState<"ALL" | "DUTY">("ALL")
+  const [doctorFilter, setDoctorFilter] = React.useState<(typeof DOCTOR_FILTERS)[number]["value"]>("CURRENT")
 
   React.useEffect(() => {
     api.get("/doctors")
@@ -70,19 +63,23 @@ export function DoctorsDirectory() {
       })
   }, [])
 
+  const showingFormer = doctorFilter === "FORMER"
+  const query = searchQuery.trim().toLowerCase()
+  const hasSearchFilters = Boolean(query) || selectedDept !== "ALL"
   const filteredDoctors = doctors.filter((doc) => {
+    const isFormer = doc.employmentStatus === "FORMER"
+    if (showingFormer !== isFormer || (doctorFilter === "DUTY" && !doc.available)) return false
+
     const matchesSearch =
-      doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (doc.department && doc.department.toLowerCase().includes(searchQuery.toLowerCase()))
+      doc.name.toLowerCase().includes(query) ||
+      doc.specialty.toLowerCase().includes(query) ||
+      doc.department?.toLowerCase().includes(query)
 
     const matchesDept =
       selectedDept === "ALL" ||
       (doc.department && doc.department.toLowerCase() === selectedDept.toLowerCase())
 
-    const matchesDuty = filterDuty === "ALL" || doc.available === true
-
-    return matchesSearch && matchesDept && matchesDuty
+    return matchesSearch && matchesDept
   })
 
   return (
@@ -114,7 +111,7 @@ export function DoctorsDirectory() {
             {t("Meet Our Specialist")} <span className="text-[#1e40af]">{t("Doctors")}</span>
           </h1>
           <p className="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed">
-            {t("Explore our world-class medical specialists and physicians at Albirri Hospital. Find your doctor and schedule your appointment today.")}
+            {t("Meet Albirri Hospital’s current and former doctors. You can request an appointment with a doctor on our current team.")}
           </p>
         </motion.div>
 
@@ -133,29 +130,23 @@ export function DoctorsDirectory() {
               />
             </div>
 
-            {/* Duty toggle */}
-            <div className="flex items-center gap-2 self-end sm:self-auto">
-              <Button
-                variant={filterDuty === "ALL" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterDuty("ALL")}
-                className={`rounded-xl text-xs font-semibold ${
-                  filterDuty === "ALL" ? "bg-[#1e40af] text-white hover:bg-blue-800" : ""
-                }`}
-              >
-                {t("All Doctors")}
-              </Button>
-              <Button
-                variant={filterDuty === "DUTY" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterDuty("DUTY")}
-                className={`rounded-xl text-xs font-semibold gap-1.5 ${
-                  filterDuty === "DUTY" ? "bg-emerald-600 text-white hover:bg-emerald-700" : ""
-                }`}
-              >
-                <UserCheck className="size-3.5" />
-                {t("On Duty Now")}
-              </Button>
+            <div role="group" aria-label={t("Doctor status")} className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0">
+              {DOCTOR_FILTERS.map(({ value, label }) => (
+                <Button
+                  key={value}
+                  type="button"
+                  variant={doctorFilter === value ? "default" : "outline"}
+                  size="sm"
+                  aria-pressed={doctorFilter === value}
+                  onClick={() => setDoctorFilter(value)}
+                  className={`gap-1.5 rounded-xl text-xs font-semibold ${
+                    doctorFilter === value ? "bg-[#1e40af] text-white hover:bg-blue-800" : ""
+                  }`}
+                >
+                  {value === "DUTY" && <UserCheck className="size-3.5" aria-hidden="true" />}
+                  {t(label)}
+                </Button>
+              ))}
             </div>
           </div>
 
@@ -199,18 +190,22 @@ export function DoctorsDirectory() {
             <Stethoscope className="size-12 text-slate-400 mx-auto mb-3" />
             <h3 className="text-lg font-bold text-slate-900">{t("No Doctors Found")}</h3>
             <p className="mt-1 text-sm text-slate-500">
-              {t("No doctor matches your search criteria. Try selecting another department or clearing search.")}
+              {t(showingFormer && !hasSearchFilters
+                ? "No former doctors are listed yet."
+                : "No doctor matches your search criteria. Try selecting another department or clearing search.")}
             </p>
-            <Button
-              onClick={() => {
-                setSearchQuery("")
-                setSelectedDept("ALL")
-                setFilterDuty("ALL")
-              }}
-              className="mt-5 rounded-full bg-[#1e40af] text-xs font-bold"
-            >
-              {t("Reset Filters")}
-            </Button>
+            {(hasSearchFilters || doctorFilter === "DUTY") && (
+              <Button
+                onClick={() => {
+                  setSearchQuery("")
+                  setSelectedDept("ALL")
+                  if (doctorFilter === "DUTY") setDoctorFilter("CURRENT")
+                }}
+                className="mt-5 rounded-full bg-[#1e40af] text-xs font-bold"
+              >
+                {t("Reset Filters")}
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -245,17 +240,20 @@ export function DoctorsDirectory() {
                     <div className="absolute top-3.5 right-3.5">
                       <span
                         className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold backdrop-blur-md shadow-xs ${
-                          doc.available
+                          !showingFormer && doc.available
                             ? "bg-emerald-500/90 text-white"
                             : "bg-slate-700/80 text-slate-200"
                         }`}
                       >
-                        <span
-                          className={`size-1.5 rounded-full ${
-                            doc.available ? "bg-white animate-pulse" : "bg-slate-400"
-                          }`}
-                        />
-                        {doc.available ? t("On Duty") : t("Off Duty")}
+                        {!showingFormer && (
+                          <span
+                            aria-hidden="true"
+                            className={`size-1.5 rounded-full ${
+                              doc.available ? "bg-white motion-safe:animate-pulse" : "bg-slate-400"
+                            }`}
+                          />
+                        )}
+                        {t(showingFormer ? "Former Doctor" : doc.available ? "On Duty" : "Off Duty")}
                       </span>
                     </div>
 
@@ -293,18 +291,20 @@ export function DoctorsDirectory() {
                     </div>
 
                     {/* Book button */}
-                    <div className="pt-2 border-t border-slate-100">
-                      <Link
-                        href={`/appointment?doctor=${encodeURIComponent(
-                          doc.name
-                        )}&dept=${encodeURIComponent(doc.department || "general")}`}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#1e40af] py-2.5 px-4 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-600 active:scale-98"
-                      >
-                        <CalendarDays className="size-3.5" />
-                        {t("Book Appointment")}
-                        <ArrowRight className="size-3 ml-auto transition-transform group-hover:translate-x-1" />
-                      </Link>
-                    </div>
+                    {!showingFormer && (
+                      <div className="pt-2 border-t border-slate-100">
+                        <Link
+                          href={`/appointment?doctor=${encodeURIComponent(
+                            doc.name
+                          )}&dept=${encodeURIComponent(doc.department || "general")}`}
+                          className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-[#1e40af] py-2.5 px-4 text-xs font-bold text-white shadow-xs transition-colors hover:bg-emerald-600 active:scale-98"
+                        >
+                          <CalendarDays className="size-3.5" />
+                          {t("Book Appointment")}
+                          <ArrowRight className="size-3 ml-auto transition-transform group-hover:translate-x-1" />
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 </Card>
               </motion.div>

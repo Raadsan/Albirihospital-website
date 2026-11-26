@@ -19,6 +19,7 @@ import {
 import { toast } from "react-toastify"
 
 import { AppSidebar } from "@/components/app-sidebar"
+import { useAdminUser } from "@/components/admin-session-provider"
 import { SiteHeader } from "@/components/site-header"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -74,6 +75,7 @@ const emptyLeaderForm = {
 }
 
 export default function LeadershipAdminPage() {
+  const canDelete = useAdminUser().role === "ADMIN"
   const [leaders, setLeaders] = React.useState<Leader[]>([])
   const [loading, setLoading] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
@@ -145,7 +147,7 @@ export default function LeadershipAdminPage() {
     uploadFormData.append("folder", "leadership")
 
     try {
-      const response = await api.post("/upload", uploadFormData, {
+      const response = await api.post("/upload?section=leadership", uploadFormData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       if (response.data && response.data.url) {
@@ -553,15 +555,17 @@ export default function LeadershipAdminPage() {
                         <PencilIcon className="size-3.5" />
                         Edit
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 size-8 p-0 text-muted-foreground hover:text-destructive"
-                        onClick={() => handleDeleteLeader(leader.id)}
-                        title="Delete"
-                      >
-                        <Trash2Icon className="size-4" />
-                      </Button>
+                      {canDelete && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 size-8 p-0 text-muted-foreground hover:text-destructive"
+                          onClick={() => handleDeleteLeader(leader.id)}
+                          title="Delete"
+                        >
+                          <Trash2Icon className="size-4" />
+                        </Button>
+                      )}
                     </div>
                   </CardFooter>
                 </Card>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { adminCookieOptions, adminSessionCookie, fetchAdminBackend, isAdminMutation } from "@/lib/admin-session"
+import { isDashboardSection } from "@/lib/dashboard-access"
 
 const noStore = { "Cache-Control": "no-store" }
 
@@ -27,6 +28,12 @@ export async function POST(request: Request) {
         { error: data.error ?? "Sign-in failed." },
         { status: result.status, headers: noStore },
       )
+    }
+
+    const hasReceptionistAccess = data.user?.role === "RECEPTIONIST" &&
+      Array.isArray(data.user.permissions) && data.user.permissions.some(isDashboardSection)
+    if (data.user?.role !== "ADMIN" && !hasReceptionistAccess) {
+      return NextResponse.json({ error: "Dashboard access is required." }, { status: 403, headers: noStore })
     }
 
     if (typeof data.token !== "string" || !data.token) {

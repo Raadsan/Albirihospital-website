@@ -5,24 +5,42 @@ import {
   deleteUploadedImage,
 } from "../controllers/uploadController.js";
 import { upload } from "../middlewares/uploadMiddleware.js";
-import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
+import { protect, authorizeRoles, authorizeSection } from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
-// Upload single image (Admin only)
+const imageSections = new Set(["doctors", "leadership", "blogs"]);
+
+function authorizeImageUpload(req, res, next) {
+  if (req.user.role === "ADMIN") return next();
+  const { section } = req.query;
+  if (!imageSections.has(section)) {
+    return res.status(403).json({ success: false, error: "Choose an authorized image upload section." });
+  }
+  req.uploadFolder = section;
+  return authorizeSection(section)(req, res, next);
+}
+
+function setVideoFolder(req, _res, next) {
+  req.uploadFolder = "videos";
+  next();
+}
+
+// Upload an image for an authorized content section.
 router.post(
   "/",
   protect,
-  authorizeRoles("ADMIN"),
+  authorizeImageUpload,
   upload.single("image"),
   uploadSingleImage
 );
 
-// Upload a health video file (Admin only)
+// Upload a health video file.
 router.post(
   "/media",
   protect,
-  authorizeRoles("ADMIN"),
+  authorizeSection("videos"),
+  setVideoFolder,
   upload.single("file"),
   uploadSingleImage
 );

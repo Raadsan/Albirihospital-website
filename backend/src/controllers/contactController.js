@@ -44,7 +44,7 @@ export async function createContactMessage(req, res) {
 /**
  * @desc    Get all contact inquiries
  * @route   GET /api/contact
- * @access  Private (ADMIN, RECEPTIONIST)
+ * @access  Private (ADMIN)
  */
 export async function getContactMessages(req, res) {
   try {
@@ -87,7 +87,7 @@ export async function getContactMessages(req, res) {
 /**
  * @desc    Get single contact message by ID
  * @route   GET /api/contact/:id
- * @access  Private (ADMIN, RECEPTIONIST)
+ * @access  Private (ADMIN)
  */
 export async function getContactMessageById(req, res) {
   try {
@@ -129,7 +129,7 @@ export async function getContactMessageById(req, res) {
 /**
  * @desc    Update contact message status (UNREAD, READ, ARCHIVED)
  * @route   PATCH /api/contact/:id/status
- * @access  Private (ADMIN, RECEPTIONIST)
+ * @access  Private (ADMIN)
  */
 export async function updateContactMessageStatus(req, res) {
   try {

@@ -3,6 +3,7 @@ import { AboutBanner } from "@/components/About/AboutBanner"
 import { About } from "@/components/Home/About"
 import { MissionAndVision } from "@/components/About/MissionandVisison"
 import { OurStory } from "@/components/About/ourStory"
+import { CareStandards } from "@/components/About/CareStandards"
 import { CoreValues } from "@/components/About/CoreValues"
 import { WhyChoose } from "@/components/About/Why Choose"
 import { Watch } from "@/components/Home/Watch"
@@ -53,7 +54,8 @@ export default async function AboutDetailPage({
           <OurStory />
           <MissionAndVision />
           <CoreValues />
-          <WhyChoose />
+          <CareStandards />
+          {/* <WhyChoose /> */}
           <Watch />
         </>
       ) : slug === "doctors" ? (

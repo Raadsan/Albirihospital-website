@@ -1,5 +1,7 @@
 import { prisma } from "../db.js";
 
+const EMPLOYMENT_STATUSES = ["CURRENT", "FORMER"];
+
 /**
  * @desc    Get all doctors (Public)
  * @route   GET /api/doctors
@@ -7,9 +9,16 @@ import { prisma } from "../db.js";
  */
 export async function getDoctors(req, res) {
   try {
-    const { search, department, specialty, available, featured, limit } = req.query;
+    const { search, department, specialty, employmentStatus, available, featured, limit } = req.query;
 
     const where = {};
+
+    if (employmentStatus !== undefined) {
+      if (!EMPLOYMENT_STATUSES.includes(employmentStatus)) {
+        return res.status(400).json({ success: false, error: "Choose a current or former doctor status." });
+      }
+      where.employmentStatus = employmentStatus;
+    }
 
     if (available !== undefined) {
       where.available = available === "true";
@@ -104,6 +113,7 @@ export async function createDoctor(req, res) {
       details,
       department,
       experience,
+      employmentStatus = "CURRENT",
       available = true,
       featured = false,
     } = req.body;
@@ -115,7 +125,13 @@ export async function createDoctor(req, res) {
       });
     }
 
-    if (featured) {
+    if (!EMPLOYMENT_STATUSES.includes(employmentStatus)) {
+      return res.status(400).json({ success: false, error: "Choose a current or former doctor status." });
+    }
+
+    const canFeature = employmentStatus === "CURRENT" && Boolean(featured);
+
+    if (canFeature) {
       const featuredCount = await prisma.doctor.count({ where: { featured: true } });
       if (featuredCount >= 3) {
         return res.status(409).json({
@@ -135,8 +151,9 @@ export async function createDoctor(req, res) {
         details: details ? details.trim() : null,
         department: department ? department.trim().toLowerCase() : null,
         experience: experience ? experience.trim() : null,
-        available: Boolean(available),
-        featured: Boolean(featured),
+        ...(employmentStatus === "FORMER" ? { employmentStatus } : {}),
+        available: employmentStatus === "CURRENT" && Boolean(available),
+        featured: canFeature,
       },
     });
 
@@ -164,12 +181,24 @@ export async function updateDoctor(req, res) {
     const { id } = req.params;
     const updateData = { ...req.body };
 
+    if (updateData.employmentStatus !== undefined && !EMPLOYMENT_STATUSES.includes(updateData.employmentStatus)) {
+      return res.status(400).json({ success: false, error: "Choose a current or former doctor status." });
+    }
+
     const existing = await prisma.doctor.findUnique({ where: { id } });
     if (!existing) {
       return res.status(404).json({
         success: false,
         error: "Dhaqtarka lama helin (Doctor not found)",
       });
+    }
+
+    const currentStatus = existing.employmentStatus ?? "CURRENT";
+    const employmentStatus = updateData.employmentStatus ?? currentStatus;
+    if (employmentStatus === currentStatus) delete updateData.employmentStatus;
+    if (employmentStatus === "FORMER") {
+      updateData.available = false;
+      updateData.featured = false;
     }
 
     if (updateData.featured === true && !existing.featured) {
@@ -193,7 +222,10 @@ export async function updateDoctor(req, res) {
     if (updateData.experience === "") updateData.experience = null;
 
     const updated = await prisma.doctor.update({
-      where: { id },
+      where: {
+        id,
+        ...(existing.employmentStatus ? { employmentStatus: existing.employmentStatus } : {}),
+      },
       data: updateData,
     });
 
@@ -203,6 +235,9 @@ export async function updateDoctor(req, res) {
       data: updated,
     });
   } catch (error) {
+    if (error.code === "P2025") {
+      return res.status(409).json({ success: false, error: "This doctor changed while you were editing. Refresh and try again." });
+    }
     console.error("Update Doctor Error:", error);
     return res.status(500).json({
       success: false,

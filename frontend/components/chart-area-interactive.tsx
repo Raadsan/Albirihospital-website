@@ -29,7 +29,7 @@ import {
   ToggleGroupItem,
 } from "@/components/ui/toggle-group"
 import { Badge } from "@/components/ui/badge"
-import api from "@/app/api/api"
+import { adminApi as api } from "@/app/api/api"
 
 export const description = "Real-time interactive patient appointments chart"
 

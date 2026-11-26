@@ -18,6 +18,7 @@ import {
 import { toast } from "react-toastify"
 
 import { AppSidebar } from "@/components/app-sidebar"
+import { useAdminUser } from "@/components/admin-session-provider"
 import { SiteHeader } from "@/components/site-header"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -73,6 +74,7 @@ const emptyVideoForm = {
 
 const departmentOptions = [
   { value: "general", label: "General / Homepage" },
+  { value: "about", label: "About (Home + About pages)" },
   { value: "inpatient", label: "Inpatient" },
   { value: "outpatient", label: "Outpatient" },
   { value: "theatre", label: "Theatre (OT)" },
@@ -87,6 +89,7 @@ const getDepartmentLabel = (department: string) =>
   departmentOptions.find((option) => option.value === department)?.label || department
 
 export default function VideosPage() {
+  const canDelete = useAdminUser().role === "ADMIN"
   const [videos, setVideos] = React.useState<VideoItem[]>([])
   const [loading, setLoading] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
@@ -521,16 +524,18 @@ export default function VideosPage() {
                         <PencilIcon className="size-3.5" />
                         Edit
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-destructive"
-                        onClick={() => handleDeleteVideo(vid.id)}
-                        title="Delete Video"
-                      >
-                        <Trash2Icon className="size-3.5" />
-                        Delete
-                      </Button>
+                      {canDelete && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-destructive"
+                          onClick={() => handleDeleteVideo(vid.id)}
+                          title="Delete Video"
+                        >
+                          <Trash2Icon className="size-3.5" />
+                          Delete
+                        </Button>
+                      )}
                     </div>
                   </CardFooter>
                 </Card>

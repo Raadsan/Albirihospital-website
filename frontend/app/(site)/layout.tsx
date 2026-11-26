@@ -1,11 +1,11 @@
 import { cookies } from "next/headers";
 
 import { Footer } from "@/components/Footer";
+import { FloatingQuickLinks } from "@/components/FloatingQuickLinks";
 import { HospitalChatbot } from "@/components/HospitalChatbot";
 import { LanguageProvider } from "@/components/language-provider";
 import { Navbar } from "@/components/Navbar";
 import { Tobbar } from "@/components/Tobbar";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
 import type { Language } from "@/lib/i18n/translations";
 
 export default async function SiteLayout({
@@ -26,7 +26,7 @@ export default async function SiteLayout({
       <main className="flex-1">{children}</main>
       <Footer />
       <HospitalChatbot />
-      <WhatsAppButton />
+      <FloatingQuickLinks />
     </LanguageProvider>
   );
 }

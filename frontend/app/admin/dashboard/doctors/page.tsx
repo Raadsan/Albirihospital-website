@@ -19,6 +19,7 @@ import {
 import { toast } from "react-toastify"
 
 import { AppSidebar } from "@/components/app-sidebar"
+import { useAdminUser } from "@/components/admin-session-provider"
 import { SiteHeader } from "@/components/site-header"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -50,20 +51,7 @@ import {
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { adminApi as api } from "@/app/api/api"
 import { getApiErrorMessage } from "@/lib/api-error"
-
-export interface Doctor {
-  id: string
-  name: string
-  title: string
-  specialty: string
-  badge: string
-  image: string
-  details?: string | null
-  department?: string | null
-  experience?: string | null
-  available: boolean
-  featured: boolean
-}
+import type { Doctor, DoctorEmploymentStatus } from "@/lib/doctors"
 
 const emptyDoctorForm = {
   name: "",
@@ -74,15 +62,18 @@ const emptyDoctorForm = {
   badge: "Specialist",
   image: "/images/Dr. Abdullahi Hussein Abdi.png",
   details: "",
+  employmentStatus: "CURRENT" as DoctorEmploymentStatus,
   available: true,
   featured: false,
 }
 
 export default function DoctorsPage() {
+  const canDelete = useAdminUser().role === "ADMIN"
   const [doctors, setDoctors] = React.useState<Doctor[]>([])
   const [loading, setLoading] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [departmentFilter, setDepartmentFilter] = React.useState("ALL")
+  const [statusFilter, setStatusFilter] = React.useState<DoctorEmploymentStatus | "ALL">("ALL")
   const [isSheetOpen, setIsSheetOpen] = React.useState(false)
   const [editingDoctor, setEditingDoctor] = React.useState<Doctor | null>(null)
   const [saving, setSaving] = React.useState(false)
@@ -132,6 +123,7 @@ export default function DoctorsPage() {
       badge: doctor.badge || "Specialist",
       image: doctor.image,
       details: doctor.details || "",
+      employmentStatus: doctor.employmentStatus ?? "CURRENT",
       available: doctor.available,
       featured: doctor.featured,
     })
@@ -148,7 +140,7 @@ export default function DoctorsPage() {
     uploadFormData.append("folder", "doctors")
 
     try {
-      const response = await api.post("/upload", uploadFormData, {
+      const response = await api.post("/upload?section=doctors", uploadFormData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       if (response.data && response.data.url) {
@@ -241,7 +233,8 @@ export default function DoctorsPage() {
     const matchesDept =
       departmentFilter === "ALL" ||
       (doc.department && doc.department.toLowerCase() === departmentFilter.toLowerCase())
-    return matchesSearch && matchesDept
+    const matchesStatus = statusFilter === "ALL" || (doc.employmentStatus ?? "CURRENT") === statusFilter
+    return matchesSearch && matchesDept && matchesStatus
   })
   const featuredCount = doctors.filter((doctor) => doctor.featured).length
 
@@ -407,7 +400,28 @@ export default function DoctorsPage() {
                         </div>
                       </div>
 
-                      {/* Row 4: Photo & Cloudinary */}
+                      <div className="space-y-2">
+                        <Label htmlFor="employment-status" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Hospital Affiliation
+                        </Label>
+                        <Select<DoctorEmploymentStatus>
+                          value={formData.employmentStatus}
+                          onValueChange={(value) => setFormData((current) => ({ ...current, employmentStatus: value ?? "CURRENT" }))}
+                        >
+                          <SelectTrigger id="employment-status" className="h-11 rounded-xl border-border/80 px-3.5 text-sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="CURRENT">Current Doctor</SelectItem>
+                            <SelectItem value="FORMER">Former Doctor</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {formData.employmentStatus === "FORMER" && (
+                          <p className="text-xs text-muted-foreground">This profile will appear under Former Doctors in the directory. Appointment booking and homepage placement will be turned off for this profile.</p>
+                        )}
+                      </div>
+
+                      {/* Doctor photo */}
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <Label htmlFor="image" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -511,7 +525,7 @@ export default function DoctorsPage() {
                 </span>
                 <div>
                   <p className="font-semibold text-slate-900">Homepage Specialist Doctors</p>
-                  <p className="text-xs text-slate-600">Choose up to three doctors to display on the homepage.</p>
+                  <p className="text-xs text-slate-600">Choose up to three current doctors to display on the homepage.</p>
                 </div>
               </div>
               <Badge className="w-fit border-blue-200 bg-white text-primary hover:bg-white">{featuredCount} / 3 selected</Badge>
@@ -528,7 +542,17 @@ export default function DoctorsPage() {
                   className="pl-9 h-10"
                 />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Select<DoctorEmploymentStatus | "ALL"> value={statusFilter} onValueChange={(value) => setStatusFilter(value ?? "ALL")}>
+                  <SelectTrigger aria-label="Filter by hospital affiliation" className="h-10 w-[180px]">
+                    <SelectValue placeholder="Hospital affiliation" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">All Doctors</SelectItem>
+                    <SelectItem value="CURRENT">Current Doctors</SelectItem>
+                    <SelectItem value="FORMER">Former Doctors</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Select value={departmentFilter} onValueChange={(val) => setDepartmentFilter(val ?? "ALL")}>
                   <SelectTrigger className="w-[180px] h-10">
                     <SelectValue placeholder="Department" />
@@ -563,26 +587,35 @@ export default function DoctorsPage() {
                         <Badge variant="secondary" className="text-[11px] font-medium">
                           {doc.badge}
                         </Badge>
-                        <button
-                          onClick={() => toggleAvailability(doc.id, doc.available)}
-                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium border transition-colors ${
-                            doc.available
-                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                              : "bg-zinc-100 text-zinc-600 border-zinc-200"
-                          }`}
-                        >
-                          <span className={`size-1.5 rounded-full ${doc.available ? "bg-emerald-500" : "bg-zinc-400"}`} />
-                          {doc.available ? "On Duty" : "Off Duty"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => toggleFeatured(doc)}
-                          className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold transition-colors ${doc.featured ? "border-blue-200 bg-blue-50 text-primary" : "border-border bg-background text-muted-foreground hover:border-blue-200"}`}
-                          title={doc.featured ? "Remove from homepage" : "Show on homepage"}
-                        >
-                          <StarIcon className={`size-3 ${doc.featured ? "fill-current" : ""}`} />
-                          {doc.featured ? "Homepage" : "Feature"}
-                        </button>
+                        {doc.employmentStatus === "FORMER" ? (
+                          <Badge variant="outline" className="border-slate-200 bg-slate-50 text-[11px] text-slate-700">
+                            Former Doctor
+                          </Badge>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => toggleAvailability(doc.id, doc.available)}
+                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium border transition-colors ${
+                                doc.available
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                  : "bg-zinc-100 text-zinc-600 border-zinc-200"
+                              }`}
+                            >
+                              <span className={`size-1.5 rounded-full ${doc.available ? "bg-emerald-500" : "bg-zinc-400"}`} />
+                              {doc.available ? "On Duty" : "Off Duty"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => toggleFeatured(doc)}
+                              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold transition-colors ${doc.featured ? "border-blue-200 bg-blue-50 text-primary" : "border-border bg-background text-muted-foreground hover:border-blue-200"}`}
+                              title={doc.featured ? "Remove from homepage" : "Show on homepage"}
+                            >
+                              <StarIcon className={`size-3 ${doc.featured ? "fill-current" : ""}`} />
+                              {doc.featured ? "Homepage" : "Feature"}
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                     <CardTitle className="text-base font-bold mt-2 text-foreground">{doc.name}</CardTitle>
@@ -610,29 +643,33 @@ export default function DoctorsPage() {
                   </CardContent>
 
                   <CardFooter className="p-4 pt-2 border-t border-border/50 flex items-center justify-between">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-8 text-xs gap-1"
-                      onClick={() => toggleAvailability(doc.id, doc.available)}
-                    >
-                      {doc.available ? "Set Off-duty" : "Set Available"}
-                    </Button>
-                    <div className="flex items-center gap-1">
+                    {doc.employmentStatus !== "FORMER" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 text-xs gap-1"
+                        onClick={() => toggleAvailability(doc.id, doc.available)}
+                      >
+                        {doc.available ? "Set Off-duty" : "Set Available"}
+                      </Button>
+                    )}
+                    <div className="ms-auto flex items-center gap-1">
                       <Button size="sm" variant="ghost" className="h-8 gap-1 px-2 text-xs text-primary" onClick={() => openEditDoctor(doc)}>
                         <PencilIcon className="size-3.5" />
                         Edit
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 gap-1 px-2 text-xs text-muted-foreground hover:text-destructive"
-                        onClick={() => handleDeleteDoctor(doc.id)}
-                        title="Delete Doctor"
-                      >
-                        <Trash2Icon className="size-3.5" />
-                        Delete
-                      </Button>
+                      {canDelete && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 gap-1 px-2 text-xs text-muted-foreground hover:text-destructive"
+                          onClick={() => handleDeleteDoctor(doc.id)}
+                          title="Delete Doctor"
+                        >
+                          <Trash2Icon className="size-3.5" />
+                          Delete
+                        </Button>
+                      )}
                     </div>
                   </CardFooter>
                 </Card>

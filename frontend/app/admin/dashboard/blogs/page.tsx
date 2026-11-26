@@ -16,6 +16,7 @@ import {
 import { toast } from "react-toastify"
 
 import { AppSidebar } from "@/components/app-sidebar"
+import { useAdminUser } from "@/components/admin-session-provider"
 import { SiteHeader } from "@/components/site-header"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -74,6 +75,7 @@ const emptyBlogForm = {
 }
 
 export default function BlogsPage() {
+  const canDelete = useAdminUser().role === "ADMIN"
   const [blogs, setBlogs] = React.useState<BlogPost[]>([])
   const [loading, setLoading] = React.useState(false)
   const [uploadingImage, setUploadingImage] = React.useState(false)
@@ -151,7 +153,7 @@ export default function BlogsPage() {
     uploadFormData.append("folder", "blogs")
 
     try {
-      const response = await api.post("/upload", uploadFormData, {
+      const response = await api.post("/upload?section=blogs", uploadFormData, {
         headers: { "Content-Type": "multipart/form-data" },
       })
       if (response.data && response.data.url) {
@@ -555,16 +557,18 @@ export default function BlogsPage() {
                         <PencilIcon className="size-3.5" />
                         Edit
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-destructive"
-                        onClick={() => handleDeleteBlog(blog.id)}
-                        title="Delete Article"
-                      >
-                        <Trash2Icon className="size-3.5" />
-                        Delete
-                      </Button>
+                      {canDelete && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-destructive"
+                          onClick={() => handleDeleteBlog(blog.id)}
+                          title="Delete Article"
+                        >
+                          <Trash2Icon className="size-3.5" />
+                          Delete
+                        </Button>
+                      )}
                     </div>
                   </CardFooter>
                 </Card>

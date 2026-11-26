@@ -7,14 +7,9 @@ import { Phone, CalendarDays, Heart, Sparkles, CheckCircle2, UserRound, Stethosc
 import { AboutBanner } from "@/components/About/AboutBanner";
 import api from "@/app/api/api";
 import { getApiErrorMessage } from "@/lib/api-error";
+import type { Doctor } from "@/lib/doctors";
 
-interface DoctorItem {
-  id: string;
-  name: string;
-  specialty: string;
-  department?: string | null;
-  available: boolean;
-}
+type DoctorItem = Pick<Doctor, "id" | "name" | "specialty" | "department" | "available" | "employmentStatus">;
 
 function AppointmentFormContent() {
   const prefersReducedMotion = useReducedMotion();
@@ -31,7 +26,7 @@ function AppointmentFormContent() {
     email: '',
     department: preselectedDept.toLowerCase(),
     doctorId: '',
-    doctorName: preselectedDoctor,
+    doctorName: '',
     date: '',
     time: '',
     message: ''
@@ -46,7 +41,8 @@ function AppointmentFormContent() {
   useEffect(() => {
     api.get("/doctors")
       .then((res) => {
-        const list: DoctorItem[] = res.data?.data || (Array.isArray(res.data) ? res.data : []);
+        const profiles: DoctorItem[] = res.data?.data || (Array.isArray(res.data) ? res.data : []);
+        const list = profiles.filter((doctor) => doctor.employmentStatus !== "FORMER");
         setDoctors(list);
 
         // If preselected doctor name is in url, set doctorId and department

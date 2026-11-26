@@ -1,5 +1,6 @@
 import { credentialVersion, verifyToken } from "../utils/jwt.js";
 import { prisma } from "../db.js";
+import { canAccessSection, loadDashboardPermissions } from "../utils/dashboardAccess.js";
 
 function unauthorized(res) {
   return res.status(401).json({
@@ -34,8 +35,11 @@ export async function protect(req, res, next) {
       return unauthorized(res);
     }
 
+    const permissions = await loadDashboardPermissions(prisma, user);
+    if (user.role !== "ADMIN" && !permissions.length) return unauthorized(res);
+
     const { password, ...profile } = user;
-    req.user = profile;
+    req.user = { ...profile, permissions };
     next();
   } catch (error) {
     next(error);
@@ -54,7 +58,19 @@ export function authorizeRoles(...roles) {
   };
 }
 
-export function requireAdminForDrafts(req, res, next) {
-  if (req.query.all !== "true") return next();
-  return protect(req, res, () => authorizeRoles("ADMIN")(req, res, next));
+export function authorizeSection(section) {
+  return (req, res, next) => {
+    if (!canAccessSection(req.user, section)) {
+      return res.status(403).json({ success: false, error: "You do not have access to this dashboard section." });
+    }
+    next();
+  };
+}
+
+export function protectDrafts(section) {
+  const authorize = authorizeSection(section);
+  return (req, res, next) => {
+    if (req.query.all !== "true") return next();
+    return protect(req, res, () => authorize(req, res, next));
+  };
 }

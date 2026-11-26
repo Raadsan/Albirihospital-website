@@ -110,10 +110,6 @@ export function CoreValues() {
                                 whileHover={prefersReducedMotion ? undefined : { y: -8 }}
                                 className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-[0_12px_35px_rgba(15,23,42,0.08)] transition-all duration-500 hover:border-[#1E40AF] hover:bg-[#0d245f] hover:shadow-[0_22px_55px_rgba(13,36,95,0.24)] sm:p-7"
                             >
-                                <span className="absolute right-5 top-4 text-5xl font-black text-slate-200/70 transition-colors duration-500 group-hover:text-white/[0.08]">
-                                    0{index + 1}
-                                </span>
-
                                 <div
                                     className={`flex size-13 items-center justify-center rounded-2xl transition-all duration-500 group-hover:rotate-3 group-hover:text-white ${value.accent}`}
                                 >

@@ -2,23 +2,29 @@
 
 import Image from "next/image"
 import { motion, useReducedMotion } from "framer-motion"
-import { Sprout, Hospital, Users, HeartPulse, UserCheck } from "lucide-react"
+import { Sprout, Hospital, Users, ShieldCheck, HeartPulse, UserCheck } from "lucide-react"
+import { useLanguage } from "@/components/language-provider"
 
 const storyMilestones = [
   {
     icon: Sprout,
-    title: "A Nation Rebuilding",
-    text: "Albirri Hospital emerged during Somalia's period of recovery, when communities needed reliable access to essential healthcare. Born from a shared commitment to rebuild and heal, it set out to provide quality medical care for all, regardless of background.",
+    title: "A nation rebuilding",
+    text: "Following the collapse of the Somali government in 1991, the nation experienced a severe disruption of essential public services, with the healthcare sector among the most affected. Hospitals, clinics, and public health systems deteriorated, leaving millions of people without access to reliable and affordable medical care. In response, Somali communities launched initiatives to rebuild critical social infrastructure, prioritizing the restoration of dependable and accessible healthcare services. These collective efforts marked the beginning of a national recovery journey focused on restoring dignity, wellbeing, and hope for future generations.",
   },
   {
     icon: Hospital,
-    title: "Albirri Hospital is Founded",
-    text: "Established to serve the community, Albirri Hospital brings together dedicated healthcare professionals, modern facilities, and a patient-centered approach to deliver accessible, high-quality care in Somalia.",
+    title: "Albirri Hospital is founded",
+    text: "Albirri Hospital was established as part of this national recovery effort, with a clear mission to serve the community by delivering high-quality, dependable, and first-class medical care at low cost through patient-centered services grounded in professionalism, trust, and compassion. Founded on 14th April 2013 by the Somali local NGO Markaz Ahlu-Hadith in partnership with a team of Somali and international medical doctors, the hospital was created to strengthen Somalia’s healthcare system and bridge the gap between high-cost private hospitals and lower-level healthcare facilities. From its inception, Albirri Hospital has been guided by a strong commitment to ethical medical practice, social responsibility, and community service.",
   },
   {
     icon: Users,
-    title: "Trusted Care Across Somalia",
-    text: "Today, Albirri Hospital continues to expand its services, improve community health, and invest in a healthier, stronger Somalia — with a focus on accessible, compassionate care for every patient.",
+    title: "Trusted care across Somalia",
+    text: "Today, Albirri Hospital operates as a licensed and fully registered healthcare service provider under the Federal Government of Somalia, in full compliance with the Ministry of Health regulations and national healthcare standards. The hospital delivers world-class medical services through fast and reliable care, highly qualified medical professionals, advanced medical technology, quality medicines, and a modern patient-centered healthcare environment. Albirri Hospital serves communities across multiple regions of Somalia, including Mogadishu in the Banadir Region and Adado Town in Galmudug State, providing accessible and affordable healthcare solutions to thousands of patients every year.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "A healthier, stronger Somalia",
+    text: "Patient safety, security, and trust remain the core pillars of Albirri Hospital. The hospital maintains strict clinical protocols, modern security systems, and a clean, well-organized medical environment to ensure every patient receives safe, confidential, and professional care. Since 2013, Albirri Hospital has consistently supported the Somali community by expanding access to quality healthcare services. With a long-term vision to become a nationwide healthcare provider, the hospital continues to invest in innovation, modern technology, and human capital. Today, Albirri Hospital stands as a symbol of resilience, excellence, and community commitment, dedicated to delivering dependable, first-class medical care at affordable cost for a healthier and stronger Somalia.",
   },
 ] as const
 
@@ -42,9 +48,10 @@ const hospitalStats = [
 
 export function OurStory() {
   const prefersReducedMotion = useReducedMotion()
+  const { t } = useLanguage()
 
   return (
-    <section className="relative overflow-hidden bg-[#F8FAFC] py-20 px-4 sm:px-6 lg:px-8">
+    <section aria-labelledby="our-story-heading" className="relative overflow-clip bg-[#F8FAFC] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
       {/* Background ambient decorative blurs */}
       <div
         aria-hidden="true"
@@ -62,69 +69,67 @@ export function OurStory() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto mb-14 max-w-3xl text-center lg:mb-16"
+          className="mx-auto mb-10 max-w-3xl text-center sm:mb-14 lg:mb-16"
         >
           {/* Eyebrow badge */}
           <div className="flex items-center justify-center gap-3">
             <span className="h-[1.5px] w-7 bg-blue-400" />
             <span className="text-xs font-bold uppercase tracking-[0.25em] text-[#1E40AF]">
-              Our Journey
+              {t("Our journey")}
             </span>
             <span className="h-[1.5px] w-7 bg-blue-400" />
           </div>
 
           {/* Heading */}
-          <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-[44px] lg:leading-tight">
-            Our Story of <span className="text-[#1E40AF]">Care &amp; Resilience</span>
+          <h2 id="our-story-heading" className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-[44px] lg:leading-tight">
+            {t("Our Story of")}{" "}<span className="text-[#1E40AF]">{t("Care & Resilience")}</span>
           </h2>
 
           {/* Subtitle */}
           <p className="mt-3.5 text-base sm:text-lg text-slate-500 font-normal leading-relaxed">
-            From a community-led recovery effort to a trusted healthcare provider
-            serving patients across Somalia.
+            {t("From a community-led recovery effort to a trusted healthcare provider serving patients across Somalia.")}
           </p>
         </motion.div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-8 items-stretch">
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,5fr)]">
           {/* Left Column: Hospital Image + Stats Card */}
           <motion.div
             initial={prefersReducedMotion ? false : { opacity: 0, x: -25 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col justify-between gap-6"
+            className="flex min-w-0 flex-col gap-6 lg:sticky lg:top-36"
           >
             {/* Image Container */}
-            <div className="relative min-h-[300px] sm:min-h-[360px] lg:min-h-[380px] w-full flex-1 overflow-hidden rounded-3xl bg-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-slate-100">
+            <div className="relative aspect-[3/2] w-full overflow-hidden rounded-3xl border border-slate-100 bg-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
               <Image
                 src="/images/2.png"
-                alt="Albirri Hospital Grounds and Medical Center"
+                alt={t("Albirri Hospital Grounds and Medical Center")}
                 fill
-                sizes="(min-width: 1024px) 50vw, 100vw"
+                sizes="(min-width: 1280px) 530px, (min-width: 1024px) 44vw, 100vw"
                 className="object-cover transition-transform duration-700 hover:scale-105"
-                priority
               />
             </div>
 
             {/* Stats Card */}
-            <div className="rounded-3xl bg-white p-6 sm:p-7 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-slate-100/90">
+            <div className="rounded-3xl border border-slate-100/90 bg-white px-3 py-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] sm:p-6">
               <div className="grid grid-cols-3 divide-x divide-slate-100">
                 {hospitalStats.map((stat) => {
                   const Icon = stat.icon
                   return (
                     <div
                       key={stat.label}
-                      className="flex flex-col items-center px-2 text-center sm:px-4"
+                      className="flex min-w-0 flex-col items-center px-1.5 text-center sm:px-3"
                     >
                       <div className="mb-3 flex size-11 items-center justify-center rounded-full bg-blue-50 text-[#1E40AF]">
-                        <Icon className="size-5" />
+                        <Icon className="size-5" aria-hidden="true" />
                       </div>
                       <span className="text-xl font-extrabold text-slate-900 sm:text-2xl">
                         {stat.value}
                       </span>
                       <span className="mt-1 text-xs sm:text-sm font-medium text-slate-500">
-                        {stat.label}
+                        {t(stat.label)}
                       </span>
                     </div>
                   )
@@ -133,12 +138,12 @@ export function OurStory() {
             </div>
           </motion.div>
 
-          {/* Right Column: 3 Story Milestones */}
-          <div className="flex flex-col justify-between gap-5 sm:gap-6">
+          {/* Right Column: Story Milestones */}
+          <div className="grid min-w-0 gap-5 sm:gap-6">
             {storyMilestones.map((milestone, index) => {
               const Icon = milestone.icon
               return (
-                <motion.div
+                <motion.article
                   key={milestone.title}
                   initial={prefersReducedMotion ? false : { opacity: 0, x: 25 }}
                   whileInView={{ opacity: 1, x: 0 }}
@@ -148,20 +153,20 @@ export function OurStory() {
                     duration: 0.6,
                     ease: [0.22, 1, 0.36, 1],
                   }}
-                  className="group flex flex-1 items-start gap-5 rounded-3xl bg-white p-6 sm:p-7 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-slate-100/90 transition-all duration-300 hover:shadow-[0_8px_30px_rgba(30,64,175,0.08)] hover:border-blue-100"
+                  className="rounded-3xl border border-slate-100/90 bg-white p-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] transition-[border-color,box-shadow] duration-300 hover:border-blue-100 hover:shadow-[0_8px_30px_rgba(30,64,175,0.08)] sm:p-7"
                 >
-                  <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[#1E40AF] transition-transform duration-300 group-hover:scale-110">
-                    <Icon className="size-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900 sm:text-xl">
-                      {milestone.title}
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[#1E40AF] sm:size-11">
+                      <Icon className="size-5" aria-hidden="true" />
+                    </div>
+                    <h3 className="text-lg font-bold leading-snug text-slate-900 sm:text-xl">
+                      {t(milestone.title)}
                     </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600 sm:text-[15px]">
-                      {milestone.text}
-                    </p>
                   </div>
-                </motion.div>
+                  <p className="mt-3 text-sm leading-7 text-slate-600 sm:ms-[3.75rem] sm:text-[15px]">
+                    {t(milestone.text)}
+                  </p>
+                </motion.article>
               )
             })}
           </div>

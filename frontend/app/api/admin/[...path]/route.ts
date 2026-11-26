@@ -1,13 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { adminCookieOptions, adminSessionCookie, fetchAdminBackend, isAdminMutation } from "@/lib/admin-session"
+import { adminCookieOptions, adminSessionCookie, fetchAdminBackend, getAdminUser, isAdminMutation } from "@/lib/admin-session"
+import { canAccessDashboard, isDashboardSection } from "@/lib/dashboard-access"
 
 type Context = { params: Promise<{ path: string[] }> }
 
 const pathsByMethod: Record<string, RegExp> = {
-  GET: /^(?:appointments|contact|blogs|videos|doctors|leadership)(?:\/[\w-]{1,191})?$/,
-  POST: /^(?:blogs|videos|doctors|leadership|upload(?:\/(?:media|multiple))?)$/,
-  PATCH: /^(?:auth\/password|(?:appointments|contact)\/[\w-]{1,191}\/status|(?:blogs|videos|doctors|leadership)\/[\w-]{1,191})$/,
-  DELETE: /^(?:upload|(?:appointments|contact|blogs|videos|doctors|leadership)\/[\w-]{1,191})$/,
+  GET: /^(?:auth\/users|(?:appointments|contact|blogs|videos|doctors|leadership)(?:\/[\w-]{1,191})?)$/,
+  POST: /^(?:auth\/register|blogs|videos|doctors|leadership|upload(?:\/(?:media|multiple))?)$/,
+  PATCH: /^(?:auth\/(?:password|users\/[\w-]{1,191}(?:\/permissions)?)|(?:appointments|contact)\/[\w-]{1,191}\/status|(?:blogs|videos|doctors|leadership)\/[\w-]{1,191})$/,
+  DELETE: /^(?:upload|(?:auth\/users|appointments|contact|blogs|videos|doctors|leadership)\/[\w-]{1,191})$/,
 }
 
 const noStore = { "Cache-Control": "private, no-store" }
@@ -26,6 +27,19 @@ async function forward(request: NextRequest, context: Context) {
   const path = segments.join("/")
   if (segments.some((segment) => segment.includes("/")) || !pathsByMethod[request.method]?.test(path)) {
     return NextResponse.json({ error: "Route not found." }, { status: 404, headers: noStore })
+  }
+
+  const user = await getAdminUser()
+  if (!user) {
+    return NextResponse.json({ error: "Please sign in to continue." }, { status: 401, headers: noStore })
+  }
+  if (user.role !== "ADMIN" && path !== "auth/password") {
+    const section = path === "upload/media" ? "videos"
+      : path === "upload" ? request.nextUrl.searchParams.get("section")
+      : segments[0]
+    if (request.method === "DELETE" || !isDashboardSection(section) || !canAccessDashboard(user, section)) {
+      return NextResponse.json({ error: "You do not have access to this dashboard action." }, { status: 403, headers: noStore })
+    }
   }
 
   const headers = new Headers({ Authorization: "Bearer " + token })

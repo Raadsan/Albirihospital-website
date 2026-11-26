@@ -1,4 +1,5 @@
 import { prisma } from "../db.js";
+import { canAccessSection } from "../utils/dashboardAccess.js";
 
 /**
  * @desc    Get all published videos (Public)
@@ -11,8 +12,7 @@ export async function getVideos(req, res) {
 
     const where = {};
 
-    // If 'all' is not true, show only published videos to public
-    if (all !== "true" || req.user?.role !== "ADMIN") {
+    if (all !== "true" || !canAccessSection(req.user, "videos")) {
       where.published = true;
     }
 

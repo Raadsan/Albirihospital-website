@@ -18,6 +18,7 @@ import {
 import { toast } from "react-toastify"
 
 import { AppSidebar } from "@/components/app-sidebar"
+import { useAdminUser } from "@/components/admin-session-provider"
 import { SiteHeader } from "@/components/site-header"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -65,6 +66,7 @@ export interface Appointment {
 }
 
 export default function AppointmentsPage() {
+  const canDelete = useAdminUser().role === "ADMIN"
   const [appointments, setAppointments] = React.useState<Appointment[]>([])
   const [loading, setLoading] = React.useState(false)
   const [searchQuery, setSearchQuery] = React.useState("")
@@ -99,7 +101,7 @@ export default function AppointmentsPage() {
     fetchAppointments()
   }, [fetchAppointments])
 
-  // Change appointment status (Admin & Receptionist)
+  // Change appointment status
   const handleUpdateStatus = async (id: string, newStatus: AppointmentStatus) => {
     try {
       await api.patch(`/appointments/${id}/status`, { status: newStatus })
@@ -185,7 +187,7 @@ export default function AppointmentsPage() {
                   Appointments Management
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Al-Birri Hospital: Receptionist and Admin portal for patient appointment bookings.
+                  Manage Al-Birri Hospital appointment requests from the website.
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -223,7 +225,7 @@ export default function AppointmentsPage() {
                   <CardDescription className="text-xs text-amber-700 font-medium">Pending Review</CardDescription>
                   <CardTitle className="text-2xl font-bold text-amber-600">{pendingCount}</CardTitle>
                 </CardHeader>
-                <CardContent className="text-xs text-muted-foreground">Awaiting receptionist confirmation</CardContent>
+                <CardContent className="text-xs text-muted-foreground">Awaiting confirmation</CardContent>
               </Card>
               <Card className="border-border/60 shadow-xs">
                 <CardHeader className="pb-2">
@@ -411,15 +413,17 @@ export default function AppointmentsPage() {
                               </Button>
 
                               {/* Delete */}
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="h-8 size-8 p-0 text-muted-foreground hover:text-destructive"
-                                onClick={() => handleDelete(apt.id)}
-                                title="Delete Appointment"
-                              >
-                                <Trash2Icon className="size-4" />
-                              </Button>
+                              {canDelete && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 size-8 p-0 text-muted-foreground hover:text-destructive"
+                                  onClick={() => handleDelete(apt.id)}
+                                  title="Delete Appointment"
+                                >
+                                  <Trash2Icon className="size-4" />
+                                </Button>
+                              )}
                             </div>
                           </td>
                         </tr>
